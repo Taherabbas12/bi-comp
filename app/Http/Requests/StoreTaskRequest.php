@@ -20,8 +20,10 @@ class StoreTaskRequest extends FormRequest
             'due_date' => 'nullable|date|after_or_equal:start_date',
             'assigned_to_user_id' => 'required|exists:users,id',
             'supervisor_user_id' => 'nullable|exists:users,id',
-            'priority_id' => 'required|exists:priorities,id',
-            'status_id' => 'required|exists:task_statuses,id',
+
+            'priority_id' => 'nullable|string|exists:priorities,id',
+            'status_id' => 'nullable|string|exists:task_statuses,id',
+
         ];
     }
 

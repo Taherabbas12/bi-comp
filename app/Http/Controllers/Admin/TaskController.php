@@ -62,34 +62,40 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request) // <-- تأكد من استخدام Form Request
     {
-        // $data = $request->validated();
+
+          $data = $request->validated();
+
+        //   dd($data);
         // $data['created_by_user_id'] = auth()->id();
         // Task::create($data);
         // return redirect()->route('admin.tasks.index')->with('success', 'Task created successfully.');
 
         // أو مباشرة (كما في الكود الأصلي)
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'nullable|date|before_or_equal:due_date',
-            'due_date' => 'nullable|date|after_or_equal:start_date',
-            'assigned_to_user_id' => 'required|exists:users,id',
-            'supervisor_user_id' => 'nullable|exists:users,id',
-            'priority_id' => 'required|exists:priorities,id', // <-- هل هذا موجود؟
-            'status_id' => 'required|exists:task_statuses,id', // <-- هل هذا موجود؟
-        ]);
+        // $request->validate([
+        //     'title' => 'required|string|max:255',
+        //     'description' => 'nullable|string',
+        //     'start_date' => 'nullable|date|before_or_equal:due_date',
+        //     'due_date' => 'nullable|date|after_or_equal:start_date',
+        //     'assigned_to_user_id' => 'required|exists:users,id',
+        //     'supervisor_user_id' => 'nullable|exists:users,id',
+        //     'priority_id' => 'required|exists:priorities,id', // <-- هل هذا موجود؟
+        //     'status_id' => 'required|exists:task_statuses,id', // <-- هل هذا موجود؟
+        // ]);
 
-        $task = Task::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'start_date' => $request->start_date,
-            'due_date' => $request->due_date,
-            'assigned_to_user_id' => $request->assigned_to_user_id,
-            'supervisor_user_id' => $request->supervisor_user_id,
-            'priority_id' => $request->priority_id,
-            'status_id' => $request->status_id,
-            'created_by_user_id' => auth()->id(), // <-- تأكد من تعيين منشئ المهمة
-        ]);
+    // $data[ 'created_by_user_id']=           auth()->id();
+
+   $task = Task::create( $data);
+        // $task = Task::create([
+        //     'title' => $request->title,
+        //     'description' => $request->description,
+        //     'start_date' => $request->start_date,
+        //     'due_date' => $request->due_date,
+        //     'assigned_to_user_id' => $request->assigned_to_user_id,
+        //     'supervisor_user_id' => $request->supervisor_user_id,
+        //     'priority_id' => $request->priority_id,
+        //     'status_id' => $request->status_id,
+        //     'created_by_user_id' => auth()->id(),
+        // ]);
 
         return redirect()->route('admin.tasks.index')->with('success', 'Task created successfully.');
     }

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // --- تسجيل الدخول ---
-Route::get('/login', fn () => view('auth.login'))->name('login')->middleware('guest');
+Route::get('/login', fn() => view('auth.login'))->name('login')->middleware('guest');
 
 Route::post('/login', function (Request $request) {
     $credentials = $request->validate([
@@ -68,7 +68,7 @@ Route::get('/orders/{order}/success', [CustomerOrderController::class, 'success'
 // --- واجهة المشرف ---
 // Route::prefix('admin')->middleware(['auth', 'permission:view_dashboard'])->group(function () {
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'permission:view_dashboard'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // --- تعديل: فصل Routes المطلوبة ---

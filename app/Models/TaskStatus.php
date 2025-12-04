@@ -11,6 +11,8 @@ class TaskStatus extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['name', 'display_name', 'color_code', 'description'];
+    public $incrementing = false;     // مهم
+    protected $keyType = 'string';    // مهم جداً لأن UUID ليست int
 
     // علاقة: الحالة ترتبط بالعديد من المهام
     public function tasks()
