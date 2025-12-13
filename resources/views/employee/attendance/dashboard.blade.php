@@ -1,356 +1,316 @@
 @extends('layouts.employee-layout')
 
-@section('title', 'سجل الحضور')
+@section('title','سجل الحضور الشهري')
 
-@section('styles')
+
 <style>
-    /* ===========================
-       🎨 صفحة الحضور — Ultra Neon Pro
-       =========================== */
+:root{
+    --bg:#020617;
+    --card:#0f172a;
+    --border:rgba(148,163,184,.25);
+    --green:#22c55e;
+    --red:#ef4444;
+    --blue:#60a5fa;
+    --yellow:#facc15;
+    --purple:#a78bfa;
+    --text:#e5e7eb;
+}
 
-    /* عنوان الصفحة */
-    .attendance-title {
-        font-size: 1.8rem;
-        font-weight: 900;
-        margin-bottom: .2rem;
-    }
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',Tahoma;
+}
 
-    .attendance-sub {
-        font-size: 0.9rem;
-        color: #cbd5e1;
-        margin-bottom: 1rem;
-    }
+/* ===== Header ===== */
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+}
+.page-title{
+    font-size:2rem;
+    font-weight:900;
+    background:linear-gradient(135deg,#60a5fa,#a78bfa);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.action-buttons{display:flex;gap:10px;}
+.action-buttons button{
+    padding:10px 18px;
+    border-radius:12px;
+    border:none;
+    font-weight:800;
+    cursor:pointer;
+    color:#fff;
+}
+.btn-in{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.btn-out{background:linear-gradient(135deg,#ef4444,#dc2626);}
 
-    /* ========== أزرار الحضور ========== */
-    .btn-checkin-xl,
-    .btn-checkout-xl {
-        width: 100%;
-        padding: 1rem 1.2rem !important;
-        border-radius: 1rem !important;
-        font-size: 1.2rem !important;
-        font-weight: 800 !important;
-        display: flex;
-        justify-content: center;
-        gap: .5rem;
-        border: none;
-    }
+/* ===== Stats ===== */
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:16px;
+    margin-bottom:30px;
+}
+.stat-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,.6);
+}
+.stat-title{font-size:.9rem;color:#cbd5f5;}
+.stat-value{font-size:2.1rem;font-weight:900;margin:6px 0;}
+.green{color:var(--green);}
+.blue{color:var(--blue);}
+.red{color:var(--red);}
 
-    .btn-checkin-xl i,
-    .btn-checkout-xl i {
-        font-size: 1.4rem !important;
-    }
+/* ===== Table ===== */
+.calendar-wrapper{overflow-x:auto;}
+.attendance-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+}
+.attendance-table th,
+.attendance-table td{
+    border:1px solid var(--border);
+    padding:10px;
+    text-align:center;
+}
+.attendance-table th{
+    background:#020617;
+    font-weight:900;
+}
+.attendance-table td{
+    height:130px;
+    background:var(--card);
+    vertical-align:top;
+}
+.other{opacity:.35;}
+.today{outline:2px solid var(--yellow);}
+.has{outline:2px solid var(--green);}
+.no{outline:2px solid rgba(239,68,68,.5);}
+.day-number{font-size:1.4rem;font-weight:900;color:#93c5fd;}
+.duration{color:var(--green);font-weight:800;margin-top:4px;}
+.no-mark{font-size:1.6rem;color:var(--red);}
+.live-session{margin-top:6px;font-size:.8rem;color:var(--yellow);font-weight:800;}
 
-    /* ========== كرت إجمالي الساعات ========== */
-    .total-hours-card {
-        background: rgba(15, 23, 42, .85);
-        border-radius: 1.2rem;
-        padding: 1rem 1.2rem;
-        border: 2px solid rgba(59, 130, 246, .5);
-        box-shadow: 0 18px 35px rgba(0, 0, 0, .55);
-        margin-bottom: 1.2rem;
-    }
-
-    .total-hours-label {
-        font-size: 1rem;
-        margin-bottom: .2rem;
-        color: #f1f5f9;
-    }
-
-    .total-hours-value {
-        font-size: 1.6rem;
-        font-weight: 900;
-        color: #22c55e;
-        text-shadow: 0 0 12px rgba(34, 197, 94, .6);
-    }
-
-    /* ========== كروت الجلسات ========== */
-    /* --- 💥 لا حاجة لـ .sessions-grid و .attendance-session-card --- */
-
-    /* ========== QR Modal ========== */
-    #qrModal {
-        position: fixed;
-        inset: 0;
-        background: rgba(2,6,23,0.88);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-        z-index: 3000;
-    }
-
-    #qrModal.active { display: flex; }
-
-    #qrModal .modal-content {
-        background: #020617;
-        border-radius: 1.2rem;
-        padding: 1rem;
-        width: 100%;
-        max-width: 400px;
-        border: 1px solid rgba(125, 180, 255, .5);
-        box-shadow: 0 18px 45px rgba(0,0,0,.85);
-    }
-
-    #qr-reader {
-        height: 280px;
-        border-radius: 1rem;
-        overflow: hidden;
-    }
+/* ===== QR MODAL ===== */
+#qrModal{
+    position:fixed;
+    inset:0;
+    background:rgba(2,6,23,.9);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+#qrModal.active{display:flex;}
+.qr-box{
+    background:#020617;
+    padding:20px;
+    border-radius:20px;
+    width:90%;
+    max-width:420px;
+    border:1px solid var(--border);
+}
+.qr-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+.switch-btn{
+    background:#334155;
+    border:none;
+    color:#fff;
+    padding:6px 10px;
+    border-radius:8px;
+    cursor:pointer;
+}
+#qr-reader{
+    height:280px;
+    border-radius:12px;
+    overflow:hidden;
+}
+#qr-reader video{object-fit:cover;}
+.close-btn{
+    margin-top:12px;
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:#ef4444;
+    color:#fff;
+    font-weight:800;
+    cursor:pointer;
+}
 </style>
-@endsection
-
+ 
 
 @section('content')
 
-{{-- عنوان الصفحة --}}
-<div class="attendance-title">سجل الحضور لليوم</div>
-<div class="attendance-sub">تاريخ: {{ now('Asia/Baghdad')->format('Y-m-d h:i A') }}</div>
-
-{{-- أزرار الحضور --}}
-<div class="row g-2 mb-3">
-    <div class="col-12">
-        <button class="btn-checkin-xl" onclick="openQrScanner('checkin')">
-            <i class="bi bi-qr-code-scan"></i> تسجيل حضور
-        </button>
-    </div>
-    <div class="col-12">
-        <button class="btn-checkout-xl" onclick="openQrScanner('checkout')">
-            <i class="bi bi-box-arrow-right"></i> تسجيل انصراف
-        </button>
+<div class="page-header">
+    <h1 class="page-title">📅 سجل الحضور الشهري</h1>
+    <div class="action-buttons">
+        <button class="btn-in" onclick="openQr('checkin')">✅ حضور</button>
+        <button class="btn-out" onclick="openQr('checkout')">🚪 انصراف</button>
     </div>
 </div>
 
-{{-- إجمالي الساعات --}}
-<div class="total-hours-card">
-    <div class="total-hours-label">إجمالي ساعات اليوم</div>
-    <div class="total-hours-value">{{ $totalHours }}</div>
+{{-- ===== Stats ===== --}}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-title">⏱ ساعات الشهر</div>
+        <div class="stat-value green">{{ number_format($monthlyTotalHours,1) }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">✅ أيام الحضور</div>
+        <div class="stat-value blue">{{ $daysPresent }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">❌ أيام الغياب</div>
+        <div class="stat-value red">{{ $daysAbsent }}</div>
+    </div>
 </div>
 
-{{-- شبكة جلسات الحضور --}}
-<div class="row g-3"> <!-- 💥 استخدم Grid Bootstrap -->
-    @forelse($sessions as $session)
+{{-- ===== Table ===== --}}
+<div class="calendar-wrapper">
+@php
+    $day=$startOfMonth->copy();
+    $today=now()->toDateString();
+    $open=$openSessions->first();
+@endphp
 
-        @php
-            $isOpen  = !$session->check_out_at;
-            $checkIn  = $session->check_in_at?->timezone('Asia/Baghdad');
-            $checkOut = $session->check_out_at?->timezone('Asia/Baghdad');
-
-            $diffMinutes = $session->check_out_at
-                ? $session->check_in_at->diffInMinutes($session->check_out_at)
-                : null;
-
-            if ($isOpen && $checkIn) {
-                $initialCurrent = now('Asia/Baghdad')->diff($checkIn)->format('%H:%I:%S');
-            }
-        @endphp
-
-        <div class="col-12"> <!-- 💥 كل كرت يملأ العرض -->
-            <div class="card text-white bg-dark border-light"> <!-- 💥 استخدم Bootstrap Card -->
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="card-title">الجلسة رقم {{ $loop->iteration }}</h5> <!-- 💥 عنوان الجلسة -->
-                            <p class="card-text">
-                                <i class="bi bi-calendar-event"></i>
-                                <strong>التاريخ:</strong> {{ $checkIn?->format('Y/m/d') ?? '—' }} <!-- 💥 عرض التاريخ -->
-                            </p>
-                        </div>
-                        <span class="badge {{ $isOpen ? 'bg-warning text-dark' : 'bg-success' }}"> <!-- 💥 شريط الحالة -->
-                            {{ $isOpen ? 'قيد العمل' : 'مكتملة' }}
-                        </span>
-                    </div>
-
-                    <div class="row mt-2">
-                        <div class="col-6">
-                            <p class="card-text">
-                                <i class="bi bi-box-arrow-in-right text-success"></i>
-                                <strong>الدخول:</strong> {{ $checkIn?->format('h:i A') ?? '—' }}
-                            </p>
-                        </div>
-                        <div class="col-6">
-                            <p class="card-text">
-                                <i class="bi bi-box-arrow-right text-danger"></i>
-                                <strong>الخروج:</strong> {{ $checkOut?->format('h:i A') ?? '—' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mt-2">
-                        <p class="card-text">
-                            <i class="bi bi-clock-history text-info"></i>
-                            <strong>المدة:</strong>
-                            @if($diffMinutes)
-                                @php
-                                    $totalHours = $diffMinutes / 60;
-                                    $hours = floor($totalHours);
-                                    $minutes = $diffMinutes % 60;
-                                @endphp
-                                @if($hours >= 1)
-                                    {{ $hours }} ساعة و {{ $minutes }} دقيقة
-                                @else
-                                    {{ $minutes }} دقيقة
-                                @endif
-                            @else
-                                —
-                            @endif
-                        </p>
-                    </div>
-
-                    @if($isOpen && $checkIn)
-                        <div class="mt-2">
-                            <p class="card-text">
-                                <i class="bi bi-fire text-warning"></i>
-                                <strong>المدة الحالية:</strong>
-                                <span id="live-{{ $session->id }}">{{ $initialCurrent }}</span>
-                            </p>
-                        </div>
-
-                        <script>
-                            (function(){
-                                const el = document.getElementById("live-{{ $session->id }}");
-                                const start = new Date("{{ $checkIn->format('Y-m-d H:i:s') }}".replace(" ", "T"));
-
-                                setInterval(() => {
-                                    const now = new Date();
-                                    let diff = Math.floor((now - start) / 1000);
-                                    let h = String(Math.floor(diff/3600)).padStart(2,'0');
-                                    let m = String(Math.floor((diff % 3600)/60)).padStart(2,'0');
-                                    let s = String(diff % 60).padStart(2,'0');
-                                    el.textContent = `${h}:${m}:${s}`;
-                                }, 1000);
-                            })();
-                        </script>
-                    @endif
-
-                </div>
-            </div>
-        </div>
-
-    @empty
-        <div class="col-12">
-            <div class="text-center py-5">
-                <i class="bi bi-calendar-x" style="font-size: 3rem; color: #adb5bd;"></i>
-                <p class="mt-3">لا توجد جلسات لهذا اليوم.</p>
-            </div>
-        </div>
-    @endforelse
+<table class="attendance-table">
+<thead>
+<tr>
+    <th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th>
+    <th>الأربعاء</th><th>الخميس</th><th>الجمعة</th><th>السبت</th>
+</tr>
+</thead>
+<tbody>
+@while($day <= $endOfMonth)
+<tr>
+@for($i=0;$i<7;$i++)
+@php
+$d=$day->copy()->addDays($i);
+$date=$d->toDateString();
+$info=$dailyHours[$date]??['total'=>0,'isCurrentMonth'=>false,'hasAttendance'=>false];
+$h=floor($info['total']); $m=round(($info['total']-$h)*60);
+@endphp
+<td class="{{ !$info['isCurrentMonth']?'other':'' }} {{ $date==$today?'today':'' }} {{ $info['hasAttendance']?'has':'no' }}">
+@if($info['isCurrentMonth'])
+<div class="day-number">{{ $d->format('d') }}</div>
+@if($info['hasAttendance'])
+<div class="duration">{{ $h }}س {{ $m }}د</div>
+@else
+<div class="no-mark">❌</div>
+@endif
+@if($open && $date==$today)
+<div class="live-session">⏱ <span id="live"></span></div>
+@endif
+@endif
+</td>
+@endfor
+</tr>
+@php $day->addWeek(); @endphp
+@endwhile
+</tbody>
+</table>
 </div>
 
-{{-- QR MODAL --}}
+{{-- ===== QR MODAL ===== --}}
 <div id="qrModal">
-    <div class="modal-content text-white">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4 id="scanTitle"></h4>
-            <button class="btn btn-sm btn-danger" onclick="closeQrScanner()">إغلاق</button>
+    <div class="qr-box">
+        <div class="qr-header">
+            <h3 id="qrTitle"></h3>
+            <button class="switch-btn" onclick="switchCamera()">🔄 تبديل</button>
         </div>
-        <div id="cameraLabel" class="text-muted mb-2">جارٍ تحميل الكاميرا...</div>
         <div id="qr-reader"></div>
+        <button class="close-btn" onclick="closeQr()">إغلاق</button>
     </div>
 </div>
 
 @endsection
 
-
-
 @section('scripts')
-<!-- ✅ تم إصلاح الرابط - إزالة المسافات الزائدة -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
+let scanner=null,mode='checkin',cams=[],camIndex=0,locked=false;
 
-let html5QrCode = null;
-let cameras = [];
-let scanMode = "checkin";
-let scanLock = false;
+function openQr(m){
+    mode=m; locked=false;
+    document.getElementById('qrTitle').innerText=m==='checkin'?'مسح رمز الحضور':'مسح رمز الانصراف';
+    document.getElementById('qrModal').classList.add('active');
 
-const qrModal = document.getElementById("qrModal");
-
-function showQrModal(){ qrModal.classList.add('active'); }
-function hideQrModal(){ qrModal.classList.remove('active'); }
-
-function openQrScanner(mode){
-    scanMode = mode;
-    scanLock = false;
-
-    document.getElementById("scanTitle").innerText =
-        mode === "checkin" ? "مسح رمز الحضور" : "مسح رمز الانصراف";
-
-    document.getElementById("cameraLabel").innerText = "جارٍ البحث عن الكاميرات...";
-
-    showQrModal();
-
-    if (!html5QrCode)
-        html5QrCode = new Html5Qrcode("qr-reader");
-
-    Html5Qrcode.getCameras().then(devices=>{
-        cameras = devices;
-        let back = devices.findIndex(d =>
-            d.label.toLowerCase().includes("back") ||
-            d.label.toLowerCase().includes("rear")
-        );
-        startCamera(devices[back !== -1 ? back : 0].id);
-    }).catch(err => {
-        console.error("خطأ في الوصول للكاميرات:", err);
-        document.getElementById("cameraLabel").innerText = "فشل في الوصول للكاميرات.";
+    scanner=new Html5Qrcode("qr-reader");
+    Html5Qrcode.getCameras().then(list=>{
+        cams=list;
+        camIndex=list.findIndex(c=>c.label.toLowerCase().includes('back'))!=-1
+            ? list.findIndex(c=>c.label.toLowerCase().includes('back'))
+            : 0;
+        startCam();
     });
 }
 
-function startCamera(id){
-    html5QrCode.start(
-        id,
-        { fps:10, qrbox:260 },
-        code => { if(!scanLock){ scanLock=true; handleQr(code); } }
-    )
-    .then(()=> document.getElementById("cameraLabel").innerText = "الكاميرا فعالة - قم بمسح الرمز")
-    .catch(err => {
-        console.error("خطأ في بدء الكاميرا:", err);
-        document.getElementById("cameraLabel").innerText = "فشل في بدء الكاميرا";
-    });
-}
-
-function closeQrScanner(){
-    if(html5QrCode){
-        html5QrCode.stop()
-            .then(() => {
-                hideQrModal();
-                // إعادة تعيين الحالة للسماح بالمسح مرة أخرى
-                scanLock = false;
-            })
-            .catch(hideQrModal);
-    } else {
-        hideQrModal();
-    }
-}
-
-function handleQr(code){
-    navigator.geolocation.getCurrentPosition(
-        pos => send(code,pos.coords.latitude,pos.coords.longitude),
-        ()  => send(code,null,null)
+function startCam(){
+    scanner.start(
+        cams[camIndex].id,
+        {fps:10,qrbox:{width:230,height:230}},
+        code=>{
+            if(locked) return;
+            locked=true;
+            scanner.stop().then(()=>send(code));
+        }
     );
 }
 
-function send(qr,lat,lng){
-    const url = scanMode === "checkin"
-        ? "{{ route('attendance.checkin.qr') }}"
-        : "{{ route('attendance.checkout.qr') }}";
-
-    fetch(url,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json",
-            "X-CSRF-TOKEN":"{{ csrf_token() }}"
-        },
-        body:JSON.stringify({ qr_code:qr, lat, lng })
-    })
-    .then(r=>r.json())
-    .then(res=>{
-        alert(res.message);
-        location.reload();
-    })
-    .catch(err => {
-        console.error("خطأ في الإرسال:", err);
-        alert("حدث خطأ أثناء إرسال البيانات.");
-        scanLock = false; // فتح القفل للسماح بالمسح مجددًا
+function switchCamera(){
+    if(!scanner || cams.length<2) return;
+    scanner.stop().then(()=>{
+        camIndex=(camIndex+1)%cams.length;
+        startCam();
     });
 }
 
+function closeQr(){
+    if(scanner) scanner.stop().catch(()=>{});
+    document.getElementById('qrModal').classList.remove('active');
+}
+
+function send(qr){
+navigator.geolocation.getCurrentPosition(pos=>{
+fetch(
+mode==='checkin'
+? '{{ route("attendance.checkin.qr") }}'
+: '{{ route("attendance.checkout.qr") }}',
+{
+method:'POST',
+headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+body:JSON.stringify({qr_code:qr,lat:pos.coords.latitude,lng:pos.coords.longitude})
+}
+).then(r=>r.json()).then(r=>{alert(r.message);location.reload();});
+});
+}
+
+@if($open)
+(function(){
+const el=document.getElementById('live');
+const start=new Date("{{ $open->check_in_at }}".replace(" ","T"));
+setInterval(()=>{
+const s=Math.floor((new Date()-start)/1000);
+el.innerText=
+String(Math.floor(s/3600)).padStart(2,'0')+":"+
+String(Math.floor((s%3600)/60)).padStart(2,'0')+":"+
+String(s%60).padStart(2,'0');
+},1000);
+})();
+@endif
 </script>
 @endsection
