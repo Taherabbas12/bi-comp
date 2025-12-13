@@ -1,9 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /bi-comp/
 
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+    # إن كان الطلب ملفًا أو مجلدًا حقيقيًا داخل public
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -d
+    RewriteRule ^(.*)$ public/$1 [L]
 
-    RewriteRule ^ index.php [L]
+    # غير ذلك، مرر الطلب إلى Laravel
+    RewriteRule ^ public/index.php [L]
 </IfModule>
