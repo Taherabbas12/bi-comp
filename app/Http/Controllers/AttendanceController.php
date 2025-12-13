@@ -147,12 +147,14 @@ class AttendanceController extends Controller
 
 
     /* ===================== DASHBOARD ===================== */
-    public function dashboard(Request $request)
+  public function dashboard(Request $request)
     {
         $userId = Auth::id();
-        $month  = $request->input('month',now()->format('Y-m'));
+        $month  = $request->input('month', now()->format('Y-m'));
 
-        $currentMonth = Carbon::createFromFormat('Y-m-d',$month.'-05');
+        // Parse the selected month (e.g., '2025-12')
+        $currentMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        // Define period: 5th of current month to 4th of next month
         $periodStart  = $currentMonth->copy()->day(5);
         $periodEnd    = $currentMonth->copy()->addMonth()->day(4);
 
@@ -164,28 +166,26 @@ class AttendanceController extends Controller
         $day = $startOfMonth->copy();
 
         while($day <= $endOfMonth){
-
             $date = $day->toDateString();
-            $isInPeriod = $day->between($periodStart,$periodEnd);
+            $isInPeriod = $day->between($periodStart, $periodEnd);
 
             $dailyHours[$date] = [
-                'total'=>0,
-                'isCurrentMonth'=>$isInPeriod,
-                'hasAttendance'=>false,
-                'distance'=>null
+                'total' => 0,
+                'isCurrentMonth' => $isInPeriod,
+                'hasAttendance' => false,
+                'distance' => null
             ];
 
             if($isInPeriod){
-                $records = Attendance::where('user_id',$userId)
-                    ->where('work_date',$date)->get();
+                $records = Attendance::where('user_id', $userId)
+                    ->where('work_date', $date)->get();
 
                 $dayTotal = 0;
                 $lastDistance = null;
 
                 foreach($records as $r){
                     if($r->check_in_at && $r->check_out_at){
-                        $dayTotal += $r->check_in_at
-                            ->floatDiffInHours($r->check_out_at);
+                        $dayTotal += $r->check_in_at->floatDiffInHours($r->check_out_at);
                     }
                     if($r->distance_meters){
                         $lastDistance = $r->distance_meters;
@@ -193,9 +193,9 @@ class AttendanceController extends Controller
                 }
 
                 if($dayTotal > 0){
-                    $dailyHours[$date]['total']=$dayTotal;
-                    $dailyHours[$date]['hasAttendance']=true;
-                    $dailyHours[$date]['distance']=$lastDistance;
+                    $dailyHours[$date]['total'] = $dayTotal;
+                    $dailyHours[$date]['hasAttendance'] = true;
+                    $dailyHours[$date]['distance'] = $lastDistance;
                     $monthlyTotalHours += $dayTotal;
                 }
             }
@@ -203,34 +203,33 @@ class AttendanceController extends Controller
             $day->addDay();
         }
 
-        // 获取所有开放的会话
-        $openSessions = Attendance::where('user_id',$userId)
+        $openSessions = Attendance::where('user_id', $userId)
             ->whereNull('check_out_at')->get();
 
-        // 检查是否有被遗忘的会话 (签到时间早于今天)
+        // Check for forgotten session
         $forgottenSession = null;
         $today = now()->toDateString();
         foreach ($openSessions as $session) {
             if ($session->check_in_at->toDateString() < $today) {
                  $forgottenSession = $session;
-                 break; // 找到最早的遗忘会话即可
+                 break;
             }
         }
 
-        $daysPresent = collect($dailyHours)->where('hasAttendance',true)->count();
+        $daysPresent = collect($dailyHours)->where('hasAttendance', true)->count();
         $daysAbsent  = collect($dailyHours)
-            ->where('isCurrentMonth',true)
-            ->where('hasAttendance',false)->count();
+            ->where('isCurrentMonth', true)
+            ->where('hasAttendance', false)->count();
 
-        return view('employee.attendance.dashboard',compact(
-            'currentMonth','periodStart','periodEnd',
-            'startOfMonth','endOfMonth',
-            'dailyHours','monthlyTotalHours',
-            'openSessions', 'forgottenSession', // 将遗忘会话传递给视图
-            'daysPresent','daysAbsent'
+        // Pass currentMonth to the view for the selector
+        return view('employee.attendance.dashboard', compact(
+            'currentMonth', 'periodStart', 'periodEnd',
+            'startOfMonth', 'endOfMonth',
+            'dailyHours', 'monthlyTotalHours',
+            'openSessions', 'forgottenSession',
+            'daysPresent', 'daysAbsent'
         ));
     }
-
     /* ===================== DISTANCE ===================== */
     private function distanceInMeters($lat1,$lon1,$lat2,$lon2):float
     {

@@ -1,547 +1,731 @@
 @extends('layouts.employee-layout')
-@section('title','سجل الحضور الشهري')
+@section('title', 'لوحة الحضور')
 
 <style>
-:root{
-    --bg:#020617;
-    --card:#0f172a;
-    --border:rgba(148,163,184,.25);
-    --green:#22c55e;
-    --red:#ef4444;
-    --blue:#60a5fa;
-    --yellow:#facc15;
-    --purple:#a78bfa;
-    --text:#e5e7eb;
-}
+    /* ===== CSS Variables ===== */
+    :root {
+        --bg: #020617;
+        --card: #0f172a;
+        --border: rgba(148, 163, 184, .25);
+        --green: #22c55e;
+        --red: #ef4444;
+        --blue: #60a5fa;
+        --yellow: #facc15;
+        --purple: #a78bfa;
+        --text: #e5e7eb;
+        --text-secondary: #94a3b8;
+        --header-height: 60px;
+        --bottom-nav-height: 60px;
+        --primary-btn-bg: linear-gradient(135deg, var(--green), #16a34a);
+        --secondary-btn-bg: linear-gradient(135deg, var(--red), #dc2626);
+        --action-btn-bg: linear-gradient(135deg, var(--blue), var(--purple));
+        --forgotten-btn-bg: linear-gradient(135deg, #f59e0b, #d97706);
+    }
 
-body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Segoe UI',Tahoma;
-}
+    /* ===== Base Styles ===== */
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        padding-bottom: var(--bottom-nav-height); /* Space for bottom nav on mobile */
+        direction: rtl; /* Right-to-left */
+        overflow-x: hidden; /* Prevent horizontal scroll */
+    }
 
-/* ===== Header ===== */
-.page-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:24px;
-}
-.page-title{
-    font-size:2rem;
-    font-weight:900;
-    background:linear-gradient(135deg,#60a5fa,#a78bfa);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-.action-buttons{display:flex;gap:10px;}
-.action-buttons button{
-    padding:10px 18px;
-    border-radius:12px;
-    border:none;
-    font-weight:800;
-    cursor:pointer;
-    color:#fff;
-}
-.btn-in{background:linear-gradient(135deg,#22c55e,#16a34a);}
-.btn-out{background:linear-gradient(135deg,#ef4444,#dc2626);}
-.btn-close-forgotten { background: linear-gradient(135deg, #f59e0b, #d97706); } /* Amber color for forgotten session */
+    /* ===== Header ===== */
+    .header {
+        background: var(--card);
+        padding: 12px 16px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid var(--border);
+    }
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--blue), var(--purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+    .month-selector {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+    }
 
-/* ===== Forgotten Session Alert ===== */
-.forgotten-alert {
-    background: var(--card);
-    border: 1px solid var(--yellow);
-    border-radius: 18px;
-    padding: 15px;
-    margin-bottom: 20px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,.6);
-}
-.forgotten-alert h3 {
-    color: var(--yellow);
-    margin: 0 0 10px 0;
-    font-size: 1.3rem;
-}
-.forgotten-alert p {
-    margin: 5px 0;
-    color: #cbd5f5;
-}
-.btn-close-forgotten {
-    margin-top: 10px;
-    padding: 8px 16px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 800;
-    cursor: pointer;
-    color: white;
-}
+    /* ===== Stats Grid ===== */
+    .stats-container {
+        padding: 16px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    .stat-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    .stat-title {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+    }
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0;
+    }
+    .stat-value.green { color: var(--green); }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.red { color: var(--red); }
 
-/* ===== Stats ===== */
-.stats-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:16px;
-    margin-bottom:30px;
-}
-.stat-card{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:18px;
-    text-align:center;
-    box-shadow:0 20px 40px rgba(0,0,0,.6);
-}
-.stat-title{font-size:.9rem;color:#cbd5f5;}
-.stat-value{font-size:2.1rem;font-weight:900;margin:6px 0;}
-.green{color:var(--green);}
-.blue{color:var(--blue);}
-.red{color:var(--red);}
+    /* ===== Forgotten Session Alert ===== */
+    .forgotten-alert {
+        background: var(--card);
+        border: 1px solid var(--yellow);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin: 0 16px 16px 16px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .forgotten-alert h3 {
+        color: var(--yellow);
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    .forgotten-alert p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
 
-/* ===== Table ===== */
-.calendar-wrapper{overflow-x:auto;}
-.attendance-table{
-    width:100%;
-    border-collapse:collapse;
-    table-layout:fixed;
-}
-.attendance-table th,
-.attendance-table td{
-    border:1px solid var(--border);
-    padding:10px;
-    text-align:center;
-}
-.attendance-table th{
-    background:#020617;
-    font-weight:900;
-}
-.attendance-table td{
-    height:130px;
-    background:var(--card);
-    vertical-align:top;
-}
-.other{opacity:.35;}
-.today{outline:2px solid var(--yellow);}
-.has{outline:2px solid var(--green);}
-.no{outline:2px solid rgba(239,68,68,.5);}
-.day-number{font-size:1.4rem;font-weight:900;color:#93c5fd;}
-.duration{color:var(--green);font-weight:800;margin-top:4px;}
-.no-mark{font-size:1.6rem;color:var(--red);}
-.live-session{margin-top:6px;font-size:.8rem;color:var(--yellow);font-weight:800;}
+    /* ===== Calendar View ===== */
+    .calendar-container {
+        padding: 0 16px 16px 16px;
+    }
+    .calendar-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 8px 0;
+    }
+    .calendar-header-day {
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    .calendar-body {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+    }
+    .calendar-day {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px;
+        min-height: 80px; /* Minimum height for mobile */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+        transition: transform 0.2s ease;
+    }
+    .calendar-day:hover {
+        transform: scale(1.02);
+        background: #1e293b; /* Slightly lighter on hover */
+    }
+    .day-number {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--blue);
+        margin-bottom: 4px;
+    }
+    .duration {
+        color: var(--green);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-top: 2px;
+    }
+    .no-mark {
+        color: var(--red);
+        font-size: 1.2rem;
+    }
+    .live-session {
+        margin-top: 4px;
+        font-size: 0.8rem;
+        color: var(--yellow);
+        font-weight: 600;
+        background: rgba(250, 204, 21, 0.1);
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
+    .today {
+        outline: 2px solid var(--yellow);
+        outline-offset: -2px;
+    }
+    .has-attendance {
+        outline: 2px solid var(--green);
+        outline-offset: -2px;
+    }
+    .other-month {
+        opacity: 0.4;
+    }
 
-/* ===== QR MODAL ===== */
-#qrModal{
-    position:fixed;
-    inset:0;
-    background:rgba(2,6,23,.9);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-}
-#qrModal.active{display:flex;}
-.qr-box{
-    background:#020617;
-    padding:20px;
-    border-radius:20px;
-    width:90%;
-    max-width:420px;
-    border:1px solid var(--border);
-    position: relative; /* Needed for overlay positioning */
-}
-.qr-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
-}
-.switch-btn{
-    background:#334155;
-    border:none;
-    color:#fff;
-    padding:6px 10px;
-    border-radius:8px;
-    cursor:pointer;
-}
-#qr-reader{
-    width: 100%;
-    height: 300px; /* Increased height for better square aspect ratio */
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #000; /* Black background for video */
-}
-#qr-reader > div {
-    width: 250px !important; /* Set fixed width for QR box */
-    height: 250px !important; /* Set fixed height for QR box */
-    position: relative; /* Relative for overlay positioning */
-    margin: auto; /* Center the box */
-}
-#qr-reader video {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-/* Overlay for scanning area */
-#qr-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; /* Allow clicks through to video */
-    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.5); /* Darken outside the scan area */
-}
-#qr-overlay::before,
-#qr-overlay::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-color: var(--green);
-    border-style: solid;
-}
-/* Top-left corner */
-#qr-overlay::before {
-    top: calc(50% - 125px); /* Half of 250px minus corner length */
-    left: calc(50% - 125px);
-    border-width: 0 0 3px 3px;
-}
-/* Top-right corner */
-#qr-overlay::after {
-    top: calc(50% - 125px);
-    right: calc(50% - 125px);
-    border-width: 0 3px 3px 0;
-}
-#qr-reader > div::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-color: var(--green);
-    border-style: solid;
-}
-/* Bottom-right corner */
-#qr-reader > div::after {
-    bottom: 0;
-    right: 0;
-    border-width: 0 3px 3px 0;
-}
-/* Bottom-left corner */
-#qr-reader > div::before {
-    bottom: 0;
-    left: 0;
-    border-width: 3px 0 0 3px;
-}
-.close-btn{
-    margin-top:12px;
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:10px;
-    background:#ef4444;
-    color:#fff;
-    font-weight:800;
-    cursor:pointer;
-}
+    /* ===== QR Modal ===== */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(2, 6, 23, 0.95);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .modal.active {
+        display: flex;
+    }
+    .modal-content {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 450px;
+        padding: 20px;
+        box-sizing: border-box;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    .modal-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .switch-btn {
+        background: #334155;
+        border: none;
+        color: var(--text);
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    .qr-scanner-container {
+        width: 100%;
+        max-width: 300px; /* Fixed max width for square */
+        height: 300px; /* Fixed height for square */
+        margin: 0 auto 16px; /* Centered */
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        background-color: #000; /* Black background for video */
+    }
+    #qr-reader {
+        width: 100%;
+        height: 100%;
+        display: flex; /* Fallback if video doesn't fill */
+        align-items: center;
+        justify-content: center;
+    }
+    #qr-reader video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Cover the container */
+    }
+    /* Overlay for scanning area */
+    .qr-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none; /* Allow clicks through to video */
+        box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.5); /* Darken outside the scan area */
+    }
+    .qr-overlay::before,
+    .qr-overlay::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-color: var(--green);
+        border-style: solid;
+    }
+    /* Top-left corner */
+    .qr-overlay::before {
+        top: calc(50% - 150px); /* Half of 300px minus corner length */
+        left: calc(50% - 150px);
+        border-width: 0 0 3px 3px;
+    }
+    /* Top-right corner */
+    .qr-overlay::after {
+        top: calc(50% - 150px);
+        right: calc(50% - 150px);
+        border-width: 0 3px 3px 0;
+    }
+    .qr-overlay-bottom-right {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-color: var(--green);
+        border-style: solid;
+        bottom: 0;
+        right: 0;
+        border-width: 0 3px 3px 0;
+    }
+    .qr-overlay-bottom-left {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-color: var(--green);
+        border-style: solid;
+        bottom: 0;
+        left: 0;
+        border-width: 3px 0 0 3px;
+    }
+
+    .close-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: var(--secondary-btn-bg);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    /* ===== Bottom Navigation (Mobile) ===== */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--card);
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-around;
+        padding: 8px 0;
+        z-index: 9999;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .nav-btn {
+        flex: 1;
+        max-width: 150px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        color: white;
+        font-size: 0.9rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        transition: background 0.2s ease;
+    }
+    .nav-btn-checkin {
+        background: var(--primary-btn-bg);
+    }
+    .nav-btn-checkout {
+        background: var(--secondary-btn-bg);
+    }
+    .nav-btn-forgotten {
+        background: var(--forgotten-btn-bg);
+    }
+    .nav-btn-other {
+        background: var(--action-btn-bg);
+    }
+    .nav-btn i { /* Assuming you use icon fonts like Font Awesome */
+        font-size: 1.2rem;
+    }
+
+    /* ===== Responsive Adjustments ===== */
+    @media (min-width: 768px) {
+        body {
+            padding-bottom: 0; /* Remove bottom padding on desktop */
+        }
+        .calendar-day {
+            min-height: 100px; /* Taller cards on desktop */
+            padding: 12px;
+        }
+        .bottom-nav {
+            display: none; /* Hide bottom nav on desktop */
+        }
+        .header {
+            padding: 16px 24px;
+        }
+        .stats-container, .calendar-container {
+            padding: 16px 24px;
+        }
+        .page-title {
+            font-size: 1.8rem;
+        }
+        .stat-card {
+            padding: 16px;
+        }
+        .stat-value {
+            font-size: 2rem;
+        }
+    }
 </style>
 
 @section('content')
-
-<div class="page-header">
-    <h1 class="page-title">📅 سجل الحضور الشهري</h1>
-    <div class="action-buttons">
-        <button class="btn-in" onclick="openQr('checkin')">✅ حضور</button>
-        <button class="btn-out" onclick="openQr('checkout')">🚪 انصراف</button>
+    <!-- Header -->
+    <div class="header">
+        <h1 class="page-title">📅 لوحة الحضور</h1>
+        <select class="month-selector" id="monthSelector" onchange="changeMonth(this.value)">
+            @for ($i = -6; $i <= 6; $i++)
+                @php $date = now()->addMonths($i)->startOfMonth(); $formatted = $date->format('Y-m'); @endphp
+                <option value="{{ $formatted }}" {{ $currentMonth->format('Y-m') == $formatted ? 'selected' : '' }}>
+                    {{ $date->translatedFormat('F Y') }}
+                </option>
+            @endfor
+        </select>
     </div>
-</div>
 
-{{-- ===== Forgotten Session Alert (Only show if exists) ===== --}}
-@if($forgottenSession)
-<div class="forgotten-alert">
-    <h3>⚠️ جلسة مفتوحة من يوم سابق!</h3>
-    <p>تم العثور على جلسة حضور مفتوحة منذ: <strong>{{ $forgottenSession->check_in_at->format('Y-m-d H:i A') }}</strong></p>
-    <p>يرجى إغلاقها يدويًا.</p>
-    <button class="btn-close-forgotten" onclick="closeForgottenSession()">✅ إغلاق الجلسة المنسية</button>
-</div>
-@endif
-
-{{-- ===== Stats ===== --}}
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-title">⏱ ساعات الشهر</div>
-        <div class="stat-value green">{{ number_format($monthlyTotalHours,1) }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-title">✅ أيام الحضور</div>
-        <div class="stat-value blue">{{ $daysPresent }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-title">❌ أيام الغياب</div>
-        <div class="stat-value red">{{ $daysAbsent }}</div>
-    </div>
-</div>
-
-{{-- ===== Table ===== --}}
-<div class="calendar-wrapper">
-@php
-    $day=$startOfMonth->copy();
-    $today=now()->toDateString();
-    $currentOpenSession = $openSessions->firstWhere('check_in_at', '>=', now()->startOfDay());
-@endphp
-
-<table class="attendance-table">
-<thead>
-<tr>
-    <th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th>
-    <th>الأربعاء</th><th>الخميس</th><th>الجمعة</th><th>السبت</th>
-</tr>
-</thead>
-<tbody>
-@while($day <= $endOfMonth)
-<tr>
-@for($i=0;$i<7;$i++)
-@php
-$d=$day->copy()->addDays($i);
-$date=$d->toDateString();
-$info=$dailyHours[$date]??['total'=>0,'isCurrentMonth'=>false,'hasAttendance'=>false];
-$h=floor($info['total']); $m=round(($info['total']-$h)*60);
-@endphp
-<td class="{{ !$info['isCurrentMonth']?'other':'' }} {{ $date==$today?'today':'' }} {{ $info['hasAttendance']?'has':'no' }}">
-@if($info['isCurrentMonth'])
-<div class="day-number">{{ $d->format('d') }}</div>
-@if($info['hasAttendance'])
-<div class="duration">{{ $h }}س {{ $m }}د</div>
-@else
-<div class="no-mark">❌</div>
-@endif
-{{-- Only show live session for today's *current* open session --}}
-@if($currentOpenSession && $date==$today)
-<div class="live-session">⏱ <span id="live">00:00:00</span></div>
-@endif
-@endif
-</td>
-@endfor
-</tr>
-@php $day->addWeek(); @endphp
-@endwhile
-</tbody>
-</table>
-</div>
-
-{{-- ===== QR MODAL ===== --}}
-<div id="qrModal">
-    <div class="qr-box">
-        <div class="qr-header">
-            <h3 id="qrTitle"></h3>
-            <button class="switch-btn" onclick="switchCamera()">🔄 تبديل</button>
+    <!-- Stats -->
+    <div class="stats-container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">⏱ ساعات الشهر</div>
+                <div class="stat-value green">{{ number_format($monthlyTotalHours, 1) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">✅ أيام الحضور</div>
+                <div class="stat-value blue">{{ $daysPresent }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">❌ أيام الغياب</div>
+                <div class="stat-value red">{{ $daysAbsent }}</div>
+            </div>
         </div>
-        <div id="qr-reader">
-            <div id="qr-overlay"></div>
-        </div>
-        <button class="close-btn" onclick="closeQr()">إغلاق</button>
     </div>
-</div>
+
+    <!-- Forgotten Session Alert -->
+    @if($forgottenSession)
+        <div class="forgotten-alert">
+            <h3>⚠️ جلسة مفتوحة من يوم سابق!</h3>
+            <p>تم العثور على جلسة حضور مفتوحة منذ: <strong>{{ $forgottenSession->check_in_at->format('Y-m-d H:i A') }}</strong></p>
+            <button class="nav-btn nav-btn-forgotten" onclick="closeForgottenSession()">
+                <i>✅</i> إغلاق الجلسة المنسية
+            </button>
+        </div>
+    @endif
+
+    <!-- Calendar View -->
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="calendar-header-day">الأحد</div>
+            <div class="calendar-header-day">الإثنين</div>
+            <div class="calendar-header-day">الثلاثاء</div>
+            <div class="calendar-header-day">الأربعاء</div>
+            <div class="calendar-header-day">الخميس</div>
+            <div class="calendar-header-day">الجمعة</div>
+            <div class="calendar-header-day">السبت</div>
+        </div>
+        <div class="calendar-body">
+            @php
+                $day = $startOfMonth->copy();
+                $today = now()->toDateString();
+                $currentOpenSession = $openSessions->firstWhere('check_in_at', '>=', now()->startOfDay());
+            @endphp
+            @while($day <= $endOfMonth)
+                @for($i = 0; $i < 7; $i++)
+                    @php
+                        $d = $day->copy()->addDays($i);
+                        $date = $d->toDateString();
+                        $info = $dailyHours[$date] ?? ['total' => 0, 'isCurrentMonth' => false, 'hasAttendance' => false];
+                        $h = floor($info['total']);
+                        $m = round(($info['total'] - $h) * 60);
+                    @endphp
+                    <div class="calendar-day
+                        {{ !$info['isCurrentMonth'] ? 'other-month' : '' }}
+                        {{ $date == $today ? 'today' : '' }}
+                        {{ $info['hasAttendance'] ? 'has-attendance' : '' }}
+                    ">
+                        @if($info['isCurrentMonth'])
+                            <div class="day-number">{{ $d->format('d') }}</div>
+                            @if($info['hasAttendance'])
+                                <div class="duration">{{ $h }}س {{ $m }}د</div>
+                            @else
+                                <div class="no-mark">❌</div>
+                            @endif
+                            @if($currentOpenSession && $date == $today)
+                                <div class="live-session">⏱ <span id="live-{{ $date }}">00:00:00</span></div>
+                            @endif
+                        @else
+                            <div class="day-number">{{ $d->format('d') }}</div>
+                        @endif
+                    </div>
+                @endfor
+                @php $day->addWeek(); @endphp
+            @endwhile
+        </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="qrModalTitle">مسح رمز الحضور</h3>
+                <button class="switch-btn" onclick="switchCamera()">🔄 تبديل</button>
+            </div>
+            <div class="qr-scanner-container">
+                <div id="qr-reader">
+                    <div class="qr-overlay">
+                        <div class="qr-overlay-bottom-right"></div>
+                        <div class="qr-overlay-bottom-left"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="close-btn" onclick="closeQr()">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <div class="bottom-nav">
+        <button class="nav-btn nav-btn-checkin" onclick="openQr('checkin')">
+            <i>✅</i> حضور
+        </button>
+        <button class="nav-btn nav-btn-checkout" onclick="openQr('checkout')">
+            <i>🚪</i> انصراف
+        </button>
+        <!-- Add other common actions here if needed -->
+    </div>
 
 @endsection
 
 @section('scripts')
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script>
-let scanner = null, mode = 'checkin', cams = [], camIndex = 0, locked = false;
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        let scanner = null, mode = 'checkin', cams = [], camIndex = 0, locked = false;
 
-// Function to format seconds into HH:MM:SS
-function formatTime(seconds) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return [h, m, s]
-        .map(v => v.toString().padStart(2, '0'))
-        .join(':');
-}
-
-function openQr(m) {
-    mode = m; locked = false;
-    document.getElementById('qrTitle').innerText = m === 'checkin' ? 'مسح رمز الحضور' : 'مسح رمز الانصراف';
-    document.getElementById('qrModal').classList.add('active');
-
-    // Delay initialization to ensure DOM is fully rendered
-    setTimeout(() => {
-        if (!document.getElementById('qr-reader')) {
-            console.error("QR reader element not found!");
-            return;
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return [h, m, s]
+                .map(v => v.toString().padStart(2, '0'))
+                .join(':');
         }
-        scanner = new Html5Qrcode("qr-reader");
 
-        Html5Qrcode.getCameras().then(list => {
-            cams = list;
-            // Prefer back camera
-            camIndex = list.findIndex(c => c.label.toLowerCase().includes('back')) !== -1
-                ? list.findIndex(c => c.label.toLowerCase().includes('back'))
-                : 0;
-            startCam();
-        }).catch(err => {
-            console.error("Error getting cameras:", err);
-            alert("خطأ في الوصول إلى الكاميرا: " + err.message);
-        });
-    }, 100);
-}
+        function openQr(m) {
+            mode = m; locked = false;
+            document.getElementById('qrModalTitle').innerText = m === 'checkin' ? 'مسح رمز الحضور' : 'مسح رمز الانصراف';
+            document.getElementById('qrModal').classList.add('active');
 
-function startCam() {
-    const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 }, // Match the CSS dimensions
-        aspectRatio: 1.0 // Enforce square aspect ratio for detection
-    };
+            setTimeout(() => {
+                if (!document.getElementById('qr-reader')) {
+                    console.error("QR reader element not found!");
+                    return;
+                }
+                scanner = new Html5Qrcode("qr-reader");
 
-    if (cams.length === 0) {
-        console.error("No cameras available.");
-        alert("لا توجد كاميرات متاحة.");
-        return;
-    }
+                Html5Qrcode.getCameras().then(list => {
+                    cams = list;
+                    camIndex = list.findIndex(c => c.label.toLowerCase().includes('back')) !== -1
+                        ? list.findIndex(c => c.label.toLowerCase().includes('back'))
+                        : 0;
+                    startCam();
+                }).catch(err => {
+                    console.error("Error getting cameras:", err);
+                    alert("خطأ في الوصول إلى الكاميرا: " + err.message);
+                });
+            }, 100);
+        }
 
-    const selectedCameraId = cams[camIndex].id;
-    scanner.start(
-        selectedCameraId,
-        config,
-        (decodedText, decodedResult) => {
-            if (locked) return;
-            locked = true;
-            console.log("QR Code scanned: ", decodedText);
-            scanner.stop().then(() => {
-                send(decodedText);
-            }).catch(err => {
-                console.error("Error stopping scanner: ", err);
-                // Still try to send the data even if stopping fails
-                send(decodedText);
+        function startCam() {
+            const config = {
+                fps: 10,
+                qrbox: { width: 240, height: 240 }, // Slightly smaller than container for overlay
+                aspectRatio: 1.0
+            };
+
+            if (cams.length === 0) {
+                console.error("No cameras available.");
+                alert("لا توجد كاميرات متاحة.");
+                return;
+            }
+
+            const selectedCameraId = cams[camIndex].id;
+            scanner.start(
+                selectedCameraId,
+                config,
+                (decodedText, decodedResult) => {
+                    if (locked) return;
+                    locked = true;
+                    console.log("QR Code scanned: ", decodedText);
+                    scanner.stop().then(() => {
+                        send(decodedText);
+                    }).catch(err => {
+                        console.error("Error stopping scanner: ", err);
+                        send(decodedText);
+                    });
+                }
+            ).catch(err => {
+                console.error("Error starting camera: ", err);
+                alert("خطأ في بدء الكاميرا: " + err.message);
+                closeQr();
             });
         }
-    ).catch(err => {
-        console.error("Error starting camera: ", err);
-        alert("خطأ في بدء الكاميرا: " + err.message);
-        closeQr(); // Close modal on error
-    });
-}
 
-function switchCamera() {
-    if (!scanner || cams.length < 2) return;
+        function switchCamera() {
+            if (!scanner || cams.length < 2) return;
 
-    scanner.stop().then(() => {
-        camIndex = (camIndex + 1) % cams.length;
-        startCam();
-    }).catch(err => {
-        console.error("Error switching camera: ", err);
-        // Fallback: just try to restart with the same camera
-        startCam();
-    });
-}
+            scanner.stop().then(() => {
+                camIndex = (camIndex + 1) % cams.length;
+                startCam();
+            }).catch(err => {
+                console.error("Error switching camera: ", err);
+                startCam();
+            });
+        }
 
-function closeQr() {
-    if (scanner) {
-        scanner.stop().catch(() => {
-            // Ignore errors when stopping during close
-        }).finally(() => {
-            document.getElementById('qrModal').classList.remove('active');
-            locked = false; // Reset lock state when closing
-        });
-    } else {
-        document.getElementById('qrModal').classList.remove('active');
-    }
-}
+        function closeQr() {
+            if (scanner) {
+                scanner.stop().catch(() => {
+                }).finally(() => {
+                    document.getElementById('qrModal').classList.remove('active');
+                    locked = false;
+                });
+            } else {
+                document.getElementById('qrModal').classList.remove('active');
+            }
+        }
 
-function send(qr) {
-    // Request geolocation
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            fetch(
-                mode === 'checkin' ? '{{ route("attendance.checkin.qr") }}' : '{{ route("attendance.checkout.qr") }}',
-                {
+        function send(qr) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    fetch(
+                        mode === 'checkin' ? '{{ route("attendance.checkin.qr") }}' : '{{ route("attendance.checkout.qr") }}',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                qr_code: qr,
+                                lat: pos.coords.latitude,
+                                lng: pos.coords.longitude
+                            })
+                        }
+                    )
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Fetch Error:', error);
+                        alert('حدث خطأ أثناء الاتصال.');
+                        locked = false;
+                    });
+                },
+                error => {
+                    console.error("Geolocation error:", error);
+                    alert("يرجى السماح بتحديد الموقع الجغرافي للحضور/الانصراف.");
+                    locked = false;
+                }
+            );
+        }
+
+        // Handle live session timer for today's current session
+        @if($currentOpenSession)
+        (function() {
+            const liveSessionElement = document.getElementById('live-{{ $today }}');
+            if (!liveSessionElement) return;
+
+            const startTime = new Date("{{ $currentOpenSession->check_in_at }}".replace(" ", "T")).getTime();
+            const updateTimer = () => {
+                const currentTime = new Date().getTime();
+                const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+                liveSessionElement.textContent = formatTime(elapsedSeconds);
+            };
+
+            updateTimer();
+            const intervalId = setInterval(updateTimer, 1000);
+
+            window.addEventListener('beforeunload', () => {
+                clearInterval(intervalId);
+            });
+        })();
+        @endif
+
+        function closeForgottenSession() {
+            if (confirm("هل أنت متأكد أنك تريد إغلاق الجلسة المنسية؟")) {
+                fetch('{{ route("attendance.handle_forgotten") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        qr_code: qr,
-                        lat: pos.coords.latitude,
-                        lng: pos.coords.longitude
-                    })
-                }
-            )
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                location.reload(); // Reload to update stats and table
-            })
-            .catch(error => {
-                console.error('Fetch Error:', error);
-                alert('حدث خطأ أثناء الاتصال.');
-                locked = false; // Unlock in case of error
-            });
-        },
-        error => {
-            console.error("Geolocation error:", error);
-            alert("يرجى السماح بتحديد الموقع الجغرافي للحضور/الانصراف.");
-            // Optionally still send without location if allowed by backend
-            // For now, we'll just unlock and let the user know.
-            locked = false;
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message || "فشل إغلاق الجلسة.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error closing forgotten session:', error);
+                    alert('حدث خطأ أثناء إغلاق الجلسة.');
+                });
+            }
         }
-    );
-}
 
-// Handle live session timer (only for today's current session)
-@if($currentOpenSession)
-(function() {
-    const liveSessionElement = document.getElementById('live');
-    if (!liveSessionElement) return; // Exit if element doesn't exist
+        function changeMonth(month) {
+            // Simple redirect example, you might want to use AJAX
+            window.location.href = '{{ route("attendance.dashboard") }}?month=' + month;
+        }
 
-    const startTime = new Date("{{ $currentOpenSession->check_in_at }}".replace(" ", "T")).getTime();
-    const updateTimer = () => {
-        const currentTime = new Date().getTime();
-        const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-        liveSessionElement.textContent = formatTime(elapsedSeconds);
-    };
-
-    updateTimer(); // Initial update
-    const intervalId = setInterval(updateTimer, 1000);
-
-    // Optional: Clear interval if needed later (e.g., on page unload)
-    window.addEventListener('beforeunload', () => {
-        clearInterval(intervalId);
-    });
-
-})();
-@endif
-
-// Function to close forgotten session
-function closeForgottenSession() {
-    if (confirm("هل أنت متأكد أنك تريد إغلاق الجلسة المنسية؟")) {
-        fetch('{{ route("attendance.handle_forgotten") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status) {
-                 alert(data.message);
-                 location.reload(); // Reload page to remove the alert and update stats
-            } else {
-                 alert(data.message || "فشل إغلاق الجلسة.");
-            }
-        })
-        .catch(error => {
-            console.error('Error closing forgotten session:', error);
-            alert('حدث خطأ أثناء إغلاق الجلسة.');
-        });
-    }
-}
-
-
-</script>
+    </script>
 @endsection
