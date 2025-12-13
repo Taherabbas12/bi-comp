@@ -114,6 +114,7 @@ Route::get('/attendance/calendar-data',
     Route::post('/attendance/check-out-qr', [AttendanceController::class, 'checkOutByQr'])
         ->name('attendance.checkout.qr');
 
+    Route::post('/attendance/handle-forgotten', [AttendanceController::class, 'handleForgottenSession'])->name('attendance.handle_forgotten');
 
         // صفحة عرض QR
         Route::get('/attendance/qr', [AttendanceQrController::class, 'show'])

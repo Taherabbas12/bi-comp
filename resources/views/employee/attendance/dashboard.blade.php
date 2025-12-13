@@ -45,6 +45,36 @@ body{
 }
 .btn-in{background:linear-gradient(135deg,#22c55e,#16a34a);}
 .btn-out{background:linear-gradient(135deg,#ef4444,#dc2626);}
+.btn-close-forgotten { background: linear-gradient(135deg, #f59e0b, #d97706); } /* Amber color for forgotten session */
+
+/* ===== Forgotten Session Alert ===== */
+.forgotten-alert {
+    background: var(--card);
+    border: 1px solid var(--yellow);
+    border-radius: 18px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,.6);
+}
+.forgotten-alert h3 {
+    color: var(--yellow);
+    margin: 0 0 10px 0;
+    font-size: 1.3rem;
+}
+.forgotten-alert p {
+    margin: 5px 0;
+    color: #cbd5f5;
+}
+.btn-close-forgotten {
+    margin-top: 10px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    color: white;
+}
 
 /* ===== Stats ===== */
 .stats-grid{
@@ -186,7 +216,6 @@ body{
     right: calc(50% - 125px);
     border-width: 0 3px 3px 0;
 }
-#qr-reader > div::before,
 #qr-reader > div::after {
     content: '';
     position: absolute;
@@ -230,6 +259,16 @@ body{
     </div>
 </div>
 
+{{-- ===== Forgotten Session Alert (Only show if exists) ===== --}}
+@if($forgottenSession)
+<div class="forgotten-alert">
+    <h3>⚠️ جلسة مفتوحة من يوم سابق!</h3>
+    <p>تم العثور على جلسة حضور مفتوحة منذ: <strong>{{ $forgottenSession->check_in_at->format('Y-m-d H:i A') }}</strong></p>
+    <p>يرجى إغلاقها يدويًا.</p>
+    <button class="btn-close-forgotten" onclick="closeForgottenSession()">✅ إغلاق الجلسة المنسية</button>
+</div>
+@endif
+
 {{-- ===== Stats ===== --}}
 <div class="stats-grid">
     <div class="stat-card">
@@ -251,7 +290,7 @@ body{
 @php
     $day=$startOfMonth->copy();
     $today=now()->toDateString();
-    $open=$openSessions->first();
+    $currentOpenSession = $openSessions->firstWhere('check_in_at', '>=', now()->startOfDay());
 @endphp
 
 <table class="attendance-table">
@@ -279,7 +318,8 @@ $h=floor($info['total']); $m=round(($info['total']-$h)*60);
 @else
 <div class="no-mark">❌</div>
 @endif
-@if($open && $date==$today)
+{{-- Only show live session for today's *current* open session --}}
+@if($currentOpenSession && $date==$today)
 <div class="live-session">⏱ <span id="live">00:00:00</span></div>
 @endif
 @endif
@@ -434,7 +474,7 @@ function send(qr) {
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                location.reload();
+                location.reload(); // Reload to update stats and table
             })
             .catch(error => {
                 console.error('Fetch Error:', error);
@@ -452,13 +492,13 @@ function send(qr) {
     );
 }
 
-// Handle live session timer
-@if($open)
+// Handle live session timer (only for today's current session)
+@if($currentOpenSession)
 (function() {
     const liveSessionElement = document.getElementById('live');
     if (!liveSessionElement) return; // Exit if element doesn't exist
 
-    const startTime = new Date("{{ $open->check_in_at }}".replace(" ", "T")).getTime();
+    const startTime = new Date("{{ $currentOpenSession->check_in_at }}".replace(" ", "T")).getTime();
     const updateTimer = () => {
         const currentTime = new Date().getTime();
         const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
@@ -475,6 +515,33 @@ function send(qr) {
 
 })();
 @endif
+
+// Function to close forgotten session
+function closeForgottenSession() {
+    if (confirm("هل أنت متأكد أنك تريد إغلاق الجلسة المنسية؟")) {
+        fetch('{{ route("attendance.handle_forgotten") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                 alert(data.message);
+                 location.reload(); // Reload page to remove the alert and update stats
+            } else {
+                 alert(data.message || "فشل إغلاق الجلسة.");
+            }
+        })
+        .catch(error => {
+            console.error('Error closing forgotten session:', error);
+            alert('حدث خطأ أثناء إغلاق الجلسة.');
+        });
+    }
+}
+
 
 </script>
 @endsection

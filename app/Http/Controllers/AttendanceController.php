@@ -42,8 +42,12 @@ class AttendanceController extends Controller
             ],403);
         }
 
-        if(Attendance::where('user_id',$user->id)->whereNull('check_out_at')->exists()){
-            return response()->json(['status'=>false,'message'=>'جلسة مفتوحة'],422);
+        // 检查是否有未关闭的会话
+        $existingOpenSession = Attendance::where('user_id',$user->id)->whereNull('check_out_at')->first();
+        if($existingOpenSession){
+            // 如果存在未关闭的会话，根据需求决定是否允许新的签到
+            // 这里返回错误，表示不能重复签到
+            return response()->json(['status'=>false,'message'=>'جلسة مفتوحة موجودة بالفعل'],422);
         }
 
         $workDate = $now->hour < 3
@@ -79,11 +83,11 @@ class AttendanceController extends Controller
 
         $attendance = Attendance::where('user_id',$user->id)
             ->whereNull('check_out_at')
-            ->orderByDesc('check_in_at')
+            ->orderByDesc('check_in_at') // 确保获取最新的未签退记录
             ->first();
 
         if(!$attendance){
-            return response()->json(['status'=>false,'message'=>'لا توجد جلسة'],422);
+            return response()->json(['status'=>false,'message'=>'لا توجد جلسة مفتوحة'],422);
         }
 
         if($attendance->check_in_at->diffInMinutes($now) < 30){
@@ -98,6 +102,49 @@ class AttendanceController extends Controller
 
         return response()->json(['status'=>true,'message'=>'🚪 تم تسجيل الانصراف']);
     }
+
+    /* ===================== HANDLE FORGOTTEN SESSION ===================== */
+    public function handleForgottenSession(Request $request)
+    {
+        $user = Auth::user();
+        $now = now();
+
+        // 查找最旧的未签退记录
+        $openSession = Attendance::where('user_id', $user->id)
+            ->whereNull('check_out_at')
+            ->orderByAsc('check_in_at') // 获取最早开始的那个
+            ->first();
+
+        if (!$openSession) {
+             return response()->json(['status' => false, 'message' => 'لا توجد جلسات مفتوحة لمعالجتها'], 404);
+        }
+
+        // 检查是否是遗忘的会话（签到时间早于今天）
+        $sessionStartDate = $openSession->check_in_at->toDateString();
+        $today = $now->toDateString();
+        if ($sessionStartDate >= $today) {
+             return response()->json(['status' => false, 'message' => 'الجلسة المفتوحة الحالية لا يمكن معالجتها كجلسة منسيّة'], 400);
+        }
+
+        // 使用当前时间或前一天晚上11点作为签退时间 (可以根据业务需求调整)
+        // 这里使用当前时间作为示例
+        $checkoutTime = $now;
+        // 或者使用前一天晚上11点
+        // $checkoutTime = $openSession->check_in_at->copy()->endOfDay(); // 这可能需要调整逻辑以确保不超过实际日期
+
+        $openSession->update([
+            'check_out_at' => $checkoutTime,
+            // 可选：更新签退位置为当前位置（如果可用）
+            // 'lat' => $request->lat ?? $openSession->lat,
+            // 'lng' => $request->lng ?? $openSession->lng,
+        ]);
+
+        // 可选：创建一条新的记录来标记这次手动处理？取决于具体需求。
+        // 例如，可以更新 work_date 或添加备注。
+
+        return response()->json(['status' => true, 'message' => '✅ تم إغلاق الجلسة المنسية بنجاح']);
+    }
+
 
     /* ===================== DASHBOARD ===================== */
     public function dashboard(Request $request)
@@ -156,8 +203,19 @@ class AttendanceController extends Controller
             $day->addDay();
         }
 
+        // 获取所有开放的会话
         $openSessions = Attendance::where('user_id',$userId)
             ->whereNull('check_out_at')->get();
+
+        // 检查是否有被遗忘的会话 (签到时间早于今天)
+        $forgottenSession = null;
+        $today = now()->toDateString();
+        foreach ($openSessions as $session) {
+            if ($session->check_in_at->toDateString() < $today) {
+                 $forgottenSession = $session;
+                 break; // 找到最早的遗忘会话即可
+            }
+        }
 
         $daysPresent = collect($dailyHours)->where('hasAttendance',true)->count();
         $daysAbsent  = collect($dailyHours)
@@ -168,7 +226,8 @@ class AttendanceController extends Controller
             'currentMonth','periodStart','periodEnd',
             'startOfMonth','endOfMonth',
             'dailyHours','monthlyTotalHours',
-            'openSessions','daysPresent','daysAbsent'
+            'openSessions', 'forgottenSession', // 将遗忘会话传递给视图
+            'daysPresent','daysAbsent'
         ));
     }
 
