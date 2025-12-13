@@ -116,6 +116,7 @@ body{
     width:90%;
     max-width:420px;
     border:1px solid var(--border);
+    position: relative; /* Needed for overlay positioning */
 }
 .qr-header{
     display:flex;
@@ -133,23 +134,78 @@ body{
 }
 #qr-reader{
     width: 100%;
-    height: 280px;
-    border-radius:12px;
-    overflow: hidden;
+    height: 300px; /* Increased height for better square aspect ratio */
     position: relative;
+    overflow: hidden;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #000; /* Black background for video */
 }
 #qr-reader > div {
-    width: 230px !important;
-    height: 230px !important;
-    margin: auto;
+    width: 250px !important; /* Set fixed width for QR box */
+    height: 250px !important; /* Set fixed height for QR box */
+    position: relative; /* Relative for overlay positioning */
+    margin: auto; /* Center the box */
 }
 #qr-reader video {
     object-fit: cover;
     width: 100%;
     height: 100%;
+    display: block;
+}
+/* Overlay for scanning area */
+#qr-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allow clicks through to video */
+    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.5); /* Darken outside the scan area */
+}
+#qr-overlay::before,
+#qr-overlay::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: var(--green);
+    border-style: solid;
+}
+/* Top-left corner */
+#qr-overlay::before {
+    top: calc(50% - 125px); /* Half of 250px minus corner length */
+    left: calc(50% - 125px);
+    border-width: 0 0 3px 3px;
+}
+/* Top-right corner */
+#qr-overlay::after {
+    top: calc(50% - 125px);
+    right: calc(50% - 125px);
+    border-width: 0 3px 3px 0;
+}
+#qr-reader > div::before,
+#qr-reader > div::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: var(--green);
+    border-style: solid;
+}
+/* Bottom-right corner */
+#qr-reader > div::after {
+    bottom: 0;
+    right: 0;
+    border-width: 0 3px 3px 0;
+}
+/* Bottom-left corner */
+#qr-reader > div::before {
+    bottom: 0;
+    left: 0;
+    border-width: 3px 0 0 3px;
 }
 .close-btn{
     margin-top:12px;
@@ -224,7 +280,7 @@ $h=floor($info['total']); $m=round(($info['total']-$h)*60);
 <div class="no-mark">❌</div>
 @endif
 @if($open && $date==$today)
-<div class="live-session">⏱ <span id="live"></span></div>
+<div class="live-session">⏱ <span id="live">00:00:00</span></div>
 @endif
 @endif
 </td>
@@ -243,7 +299,9 @@ $h=floor($info['total']); $m=round(($info['total']-$h)*60);
             <h3 id="qrTitle"></h3>
             <button class="switch-btn" onclick="switchCamera()">🔄 تبديل</button>
         </div>
-        <div id="qr-reader"></div>
+        <div id="qr-reader">
+            <div id="qr-overlay"></div>
+        </div>
         <button class="close-btn" onclick="closeQr()">إغلاق</button>
     </div>
 </div>
@@ -253,119 +311,170 @@ $h=floor($info['total']); $m=round(($info['total']-$h)*60);
 @section('scripts')
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-let scanner=null,mode='checkin',cams=[],camIndex=0,locked=false;
+let scanner = null, mode = 'checkin', cams = [], camIndex = 0, locked = false;
 
-function openQr(m){
-    mode=m; locked=false;
-    document.getElementById('qrTitle').innerText=m==='checkin'?'مسح رمز الحضور':'مسح رمز الانصراف';
+// Function to format seconds into HH:MM:SS
+function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s]
+        .map(v => v.toString().padStart(2, '0'))
+        .join(':');
+}
+
+function openQr(m) {
+    mode = m; locked = false;
+    document.getElementById('qrTitle').innerText = m === 'checkin' ? 'مسح رمز الحضور' : 'مسح رمز الانصراف';
     document.getElementById('qrModal').classList.add('active');
 
+    // Delay initialization to ensure DOM is fully rendered
     setTimeout(() => {
-        scanner=new Html5Qrcode("qr-reader");
-        Html5Qrcode.getCameras().then(list=>{
-            cams=list;
-            camIndex=list.findIndex(c=>c.label.toLowerCase().includes('back'))!=-1
-                ? list.findIndex(c=>c.label.toLowerCase().includes('back'))
+        if (!document.getElementById('qr-reader')) {
+            console.error("QR reader element not found!");
+            return;
+        }
+        scanner = new Html5Qrcode("qr-reader");
+
+        Html5Qrcode.getCameras().then(list => {
+            cams = list;
+            // Prefer back camera
+            camIndex = list.findIndex(c => c.label.toLowerCase().includes('back')) !== -1
+                ? list.findIndex(c => c.label.toLowerCase().includes('back'))
                 : 0;
             startCam();
         }).catch(err => {
             console.error("Error getting cameras:", err);
-            alert("خطأ في الوصول للكاميرا");
+            alert("خطأ في الوصول إلى الكاميرا: " + err.message);
         });
     }, 100);
 }
 
-function startCam(){
+function startCam() {
     const config = {
         fps: 10,
-        qrbox: { width: 230, height: 230 },
-        aspectRatio: 1.0 // Ensure square aspect ratio
+        qrbox: { width: 250, height: 250 }, // Match the CSS dimensions
+        aspectRatio: 1.0 // Enforce square aspect ratio for detection
     };
 
+    if (cams.length === 0) {
+        console.error("No cameras available.");
+        alert("لا توجد كاميرات متاحة.");
+        return;
+    }
+
+    const selectedCameraId = cams[camIndex].id;
     scanner.start(
-        cams[camIndex].id,
+        selectedCameraId,
         config,
-        code=>{
-            if(locked) return;
-            locked=true;
-            scanner.stop().then(()=>send(code));
+        (decodedText, decodedResult) => {
+            if (locked) return;
+            locked = true;
+            console.log("QR Code scanned: ", decodedText);
+            scanner.stop().then(() => {
+                send(decodedText);
+            }).catch(err => {
+                console.error("Error stopping scanner: ", err);
+                // Still try to send the data even if stopping fails
+                send(decodedText);
+            });
         }
     ).catch(err => {
-        console.error("Error starting camera:", err);
-        alert("خطأ في بدء الكاميرا");
+        console.error("Error starting camera: ", err);
+        alert("خطأ في بدء الكاميرا: " + err.message);
+        closeQr(); // Close modal on error
     });
 }
 
-function switchCamera(){
-    if(!scanner || cams.length<2) return;
-    scanner.stop().then(()=>{
-        camIndex=(camIndex+1)%cams.length;
+function switchCamera() {
+    if (!scanner || cams.length < 2) return;
+
+    scanner.stop().then(() => {
+        camIndex = (camIndex + 1) % cams.length;
+        startCam();
+    }).catch(err => {
+        console.error("Error switching camera: ", err);
+        // Fallback: just try to restart with the same camera
         startCam();
     });
 }
 
-function closeQr(){
-    if(scanner) {
-        scanner.stop().catch(()=>{}).finally(() => {
+function closeQr() {
+    if (scanner) {
+        scanner.stop().catch(() => {
+            // Ignore errors when stopping during close
+        }).finally(() => {
             document.getElementById('qrModal').classList.remove('active');
+            locked = false; // Reset lock state when closing
         });
     } else {
         document.getElementById('qrModal').classList.remove('active');
     }
 }
 
-function send(qr){
-    navigator.geolocation.getCurrentPosition(pos=>{
-        fetch(
-            mode==='checkin'
-            ? '{{ route("attendance.checkin.qr") }}'
-            : '{{ route("attendance.checkout.qr") }}',
-            {
-                method:'POST',
-                headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
-                body:JSON.stringify({qr_code:qr,lat:pos.coords.latitude,lng:pos.coords.longitude})
-            }
-        ).then(r=>r.json()).then(r=>{
-            alert(r.message);
-            location.reload();
-        }).catch(err => {
-            console.error("Error sending data:", err);
-            alert("خطأ في الاتصال");
+function send(qr) {
+    // Request geolocation
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            fetch(
+                mode === 'checkin' ? '{{ route("attendance.checkin.qr") }}' : '{{ route("attendance.checkout.qr") }}',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        qr_code: qr,
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude
+                    })
+                }
+            )
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert('حدث خطأ أثناء الاتصال.');
+                locked = false; // Unlock in case of error
+            });
+        },
+        error => {
+            console.error("Geolocation error:", error);
+            alert("يرجى السماح بتحديد الموقع الجغرافي للحضور/الانصراف.");
+            // Optionally still send without location if allowed by backend
+            // For now, we'll just unlock and let the user know.
             locked = false;
-        });
-    }, () => {
-        alert("يرجى السماح بتحديد الموقع الجغرافي");
-        locked = false;
-    });
+        }
+    );
 }
 
+// Handle live session timer
 @if($open)
-(function(){
-    const el=document.getElementById('live');
-    const start=new Date("{{ $open->check_in_at }}".replace(" ","T"));
+(function() {
+    const liveSessionElement = document.getElementById('live');
+    if (!liveSessionElement) return; // Exit if element doesn't exist
 
-    function updateLiveTime() {
-        const now = new Date();
-        let diffSeconds = Math.floor((now - start) / 1000);
+    const startTime = new Date("{{ $open->check_in_at }}".replace(" ", "T")).getTime();
+    const updateTimer = () => {
+        const currentTime = new Date().getTime();
+        const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+        liveSessionElement.textContent = formatTime(elapsedSeconds);
+    };
 
-        // Calculate hours, minutes, seconds
-        const hours = Math.floor(diffSeconds / 3600);
-        diffSeconds %= 3600;
-        const minutes = Math.floor(diffSeconds / 60);
-        const seconds = diffSeconds % 60;
+    updateTimer(); // Initial update
+    const intervalId = setInterval(updateTimer, 1000);
 
-        // Format as HH:MM:SS
-        const formatted =
-            String(hours).padStart(2, '0') + ':' +
-            String(minutes).padStart(2, '0') + ':' +
-            String(seconds).padStart(2, '0');
+    // Optional: Clear interval if needed later (e.g., on page unload)
+    window.addEventListener('beforeunload', () => {
+        clearInterval(intervalId);
+    });
 
-        el.innerText = formatted;
-    }
-
-    updateLiveTime(); // Initial call
-    setInterval(updateLiveTime, 1000);
 })();
 @endif
+
 </script>
 @endsection
