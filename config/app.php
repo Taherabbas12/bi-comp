@@ -104,7 +104,7 @@ return [
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
-
+'timezone' => 'Asia/Baghdad',
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver

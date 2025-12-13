@@ -15,18 +15,23 @@ class OrderController extends Controller
 {
     public function index()
     {
-        // صلاحية: view_orders_for_response
-        // middleware: permission:view_orders_for_response
-        // جلب الطلبات التي تم إنشاؤها من قبل موظف الردود الحالي أو الطلبات في حالة "قيد الانتظار"
-        $orders = Order::with(['user', 'status', 'employee']) // تحميل علاقات الطلب
-            ->where('employee_id', auth()->id()) // الطلبات المسندة إلى موظف الردود الحالي
-            ->orWhere('order_status_id', function ($query) {
-                // أو الطلبات في حالة "قيد الانتظار" (يمكنك تعديل الحالة حسب احتياجاتك)
-                $pendingStatusId = OrderStatus::where('name', 'pending')->first()->id;
-                $query->select('id')->from('order_statuses')->where('id', $pendingStatusId);
-            })
-            ->latest()
-            ->paginate(20);
+        $userId = auth()->id();
+
+        // جلب حالة pending بشكل آمن
+        $pendingStatus = \App\Models\OrderStatus::where('name', 'pending')->first();
+        $pendingStatusId = $pendingStatus ? $pendingStatus->id : null;
+
+        // بناء الاستعلام الأساسي
+        $ordersQuery = \App\Models\Order::with(['user', 'status', 'employee'])
+            ->where('employee_id', $userId);
+
+        // إذا كانت حالة pending موجودة، أضفها للنتائج
+        if ($pendingStatusId) {
+            $ordersQuery->orWhere('order_status_id', $pendingStatusId);
+        }
+
+        // جلب النتائج
+        $orders = $ordersQuery->latest()->paginate(20);
 
         return view('response.orders.index', compact('orders'));
     }

@@ -10,7 +10,6 @@ use App\Models\Task; // لجلب الموظفين
 use App\Models\TaskStatus; // لجلب الأولويات
 use App\Models\User; // لجلب الحالات
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class TaskController extends Controller
 {
@@ -64,7 +63,7 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request) // <-- تأكد من استخدام Form Request
     {
 
-        $data = $request->validated();
+          $data = $request->validated();
 
         //   dd($data);
         // $data['created_by_user_id'] = auth()->id();
@@ -83,10 +82,9 @@ class TaskController extends Controller
         //     'status_id' => 'required|exists:task_statuses,id', // <-- هل هذا موجود؟
         // ]);
 
-        $data['created_by_user_id'] = auth()->id();
-        $data['id'] = (string) Str::uuid();
+    $data[ 'created_by_user_id']=           auth()->id();
 
-        $task = Task::create($data);
+   $task = Task::create( $data);
         // $task = Task::create([
         //     'title' => $request->title,
         //     'description' => $request->description,

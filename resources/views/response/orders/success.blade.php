@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('layouts.employee-layout')
 
 @section('content')
     <div class="header">

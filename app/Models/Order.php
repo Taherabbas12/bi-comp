@@ -31,6 +31,17 @@ class Order extends Model
         'employee_id', // الموظف المُسند إليه الطلب
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
     // علاقة: الطلب تابع لمستخدم (الزبون)
     public function user()
     {

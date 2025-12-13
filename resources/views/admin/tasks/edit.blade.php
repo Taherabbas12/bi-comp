@@ -1,18 +1,18 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="card">
+            <div class="col-12 col-lg-10">
+                <div class="card text-white bg-dark border-light">
                     <div class="card-header">
-                        <h4>تعديل المهمة: {{ $task->title }}</h4>
+                        <h4 class="mb-0">تعديل المهمة: {{ $task->title }}</h4>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('admin.tasks.update', $task) }}">
                             @csrf
                             @method('PUT')
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="title" class="form-label">العنوان *</label>
@@ -43,7 +43,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="assigned_to_user_id" class="form-label">الموظف المعين *</label>
@@ -80,7 +80,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="start_date" class="form-label">تاريخ البدء</label>
@@ -104,7 +104,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="supervisor_user_id" class="form-label">المشرف</label>
@@ -146,8 +146,10 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-primary">تحديث المهمة</button>
-                            <a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary">إلغاء</a>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary">تحديث المهمة</button>
+                                <a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary">إلغاء</a>
+                            </div>
                         </form>
                     </div>
                 </div>
