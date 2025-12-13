@@ -1,7 +1,6 @@
 @extends('layouts.employee-layout')
 @section('title','سجل الحضور الشهري')
 
-
 <style>
 :root{
     --bg:#020617;
@@ -20,8 +19,6 @@ body{
     color:var(--text);
     font-family:'Segoe UI',Tahoma;
 }
-
- 
 
 /* ===== Header ===== */
 .page-header{
@@ -135,11 +132,25 @@ body{
     cursor:pointer;
 }
 #qr-reader{
-    height:280px;
+    width: 100%;
+    height: 280px;
     border-radius:12px;
-    overflow:hidden;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-#qr-reader video{object-fit:cover;}
+#qr-reader > div {
+    width: 230px !important;
+    height: 230px !important;
+    margin: auto;
+}
+#qr-reader video {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
 .close-btn{
     margin-top:12px;
     width:100%;
@@ -152,7 +163,6 @@ body{
     cursor:pointer;
 }
 </style>
-
 
 @section('content')
 
@@ -241,7 +251,7 @@ $h=floor($info['total']); $m=round(($info['total']-$h)*60);
 @endsection
 
 @section('scripts')
-<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 let scanner=null,mode='checkin',cams=[],camIndex=0,locked=false;
 
@@ -250,26 +260,40 @@ function openQr(m){
     document.getElementById('qrTitle').innerText=m==='checkin'?'مسح رمز الحضور':'مسح رمز الانصراف';
     document.getElementById('qrModal').classList.add('active');
 
-    scanner=new Html5Qrcode("qr-reader");
-    Html5Qrcode.getCameras().then(list=>{
-        cams=list;
-        camIndex=list.findIndex(c=>c.label.toLowerCase().includes('back'))!=-1
-            ? list.findIndex(c=>c.label.toLowerCase().includes('back'))
-            : 0;
-        startCam();
-    });
+    setTimeout(() => {
+        scanner=new Html5Qrcode("qr-reader");
+        Html5Qrcode.getCameras().then(list=>{
+            cams=list;
+            camIndex=list.findIndex(c=>c.label.toLowerCase().includes('back'))!=-1
+                ? list.findIndex(c=>c.label.toLowerCase().includes('back'))
+                : 0;
+            startCam();
+        }).catch(err => {
+            console.error("Error getting cameras:", err);
+            alert("خطأ في الوصول للكاميرا");
+        });
+    }, 100);
 }
 
 function startCam(){
+    const config = {
+        fps: 10,
+        qrbox: { width: 230, height: 230 },
+        aspectRatio: 1.0 // Ensure square aspect ratio
+    };
+
     scanner.start(
         cams[camIndex].id,
-        {fps:10,qrbox:{width:230,height:230}},
+        config,
         code=>{
             if(locked) return;
             locked=true;
             scanner.stop().then(()=>send(code));
         }
-    );
+    ).catch(err => {
+        console.error("Error starting camera:", err);
+        alert("خطأ في بدء الكاميرا");
+    });
 }
 
 function switchCamera(){
@@ -281,36 +305,66 @@ function switchCamera(){
 }
 
 function closeQr(){
-    if(scanner) scanner.stop().catch(()=>{});
-    document.getElementById('qrModal').classList.remove('active');
+    if(scanner) {
+        scanner.stop().catch(()=>{}).finally(() => {
+            document.getElementById('qrModal').classList.remove('active');
+        });
+    } else {
+        document.getElementById('qrModal').classList.remove('active');
+    }
 }
 
 function send(qr){
-navigator.geolocation.getCurrentPosition(pos=>{
-fetch(
-mode==='checkin'
-? '{{ route("attendance.checkin.qr") }}'
-: '{{ route("attendance.checkout.qr") }}',
-{
-method:'POST',
-headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
-body:JSON.stringify({qr_code:qr,lat:pos.coords.latitude,lng:pos.coords.longitude})
-}
-).then(r=>r.json()).then(r=>{alert(r.message);location.reload();});
-});
+    navigator.geolocation.getCurrentPosition(pos=>{
+        fetch(
+            mode==='checkin'
+            ? '{{ route("attendance.checkin.qr") }}'
+            : '{{ route("attendance.checkout.qr") }}',
+            {
+                method:'POST',
+                headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+                body:JSON.stringify({qr_code:qr,lat:pos.coords.latitude,lng:pos.coords.longitude})
+            }
+        ).then(r=>r.json()).then(r=>{
+            alert(r.message);
+            location.reload();
+        }).catch(err => {
+            console.error("Error sending data:", err);
+            alert("خطأ في الاتصال");
+            locked = false;
+        });
+    }, () => {
+        alert("يرجى السماح بتحديد الموقع الجغرافي");
+        locked = false;
+    });
 }
 
 @if($open)
 (function(){
-const el=document.getElementById('live');
-const start=new Date("{{ $open->check_in_at }}".replace(" ","T"));
-setInterval(()=>{
-const s=Math.floor((new Date()-start)/1000);
-el.innerText=
-String(Math.floor(s/3600)).padStart(2,'0')+":"+
-String(Math.floor((s%3600)/60)).padStart(2,'0')+":"+
-String(s%60).padStart(2,'0');
-},1000);
+    const el=document.getElementById('live');
+    const start=new Date("{{ $open->check_in_at }}".replace(" ","T"));
+
+    function updateLiveTime() {
+        const now = new Date();
+        let diffSeconds = Math.floor((now - start) / 1000);
+
+        // Calculate hours, minutes, seconds
+        const hours = Math.floor(diffSeconds / 3600);
+        diffSeconds %= 3600;
+        const minutes = Math.floor(diffSeconds / 60);
+        const seconds = diffSeconds % 60;
+
+        // Format as HH:MM:SS
+        const formatted =
+            String(hours).padStart(2, '0') + ':' +
+            String(minutes).padStart(2, '0') + ':' +
+            String(seconds).padStart(2, '0');
+
+        el.innerText = formatted;
+    }
+
+    updateLiveTime(); // Initial call
+    setInterval(updateLiveTime, 1000);
 })();
 @endif
 </script>
