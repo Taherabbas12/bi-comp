@@ -113,7 +113,7 @@ Route::get('/attendance/calendar-data',
 
     Route::post('/attendance/check-out-qr', [AttendanceController::class, 'checkOutByQr'])
         ->name('attendance.checkout.qr');
-     
+
 
         // صفحة عرض QR
         Route::get('/attendance/qr', [AttendanceQrController::class, 'show'])
@@ -122,7 +122,7 @@ Route::get('/attendance/calendar-data',
         // API للتحقق من الوكيشن
         Route::post('/attendance/qr/verify-location', [AttendanceQrController::class, 'verifyLocation'])
             ->name('admin.attendance.qr.verify-location');
-  
+
 //         Route::get('/attendance/qr', function () {
 //     return view('admin.attendance.qr');
 // })->name('admin.attendance.qr');
@@ -136,17 +136,17 @@ Route::prefix('admin')
 
 
 
-          
 
- 
+
+
     Route::get('/attendance', [AttendanceAdminController::class, 'index'])
         ->name('admin.attendance.index');
-        
+
 
     Route::get('/attendance/user/{id}', [AttendanceAdminController::class, 'userAttendance'])
         ->name('admin.attendance.user');
 
- 
+
         /*
         |--------------------------------------------------------------------------
         | Laptops (Admin)
@@ -348,8 +348,8 @@ Route::get('/laptops/filter', [\App\Http\Controllers\Response\LaptopController::
         // Route::get('/laptops/filter', [LaptopController::class, 'filter'])->name('response.laptops.filter');
         Route::get('/laptops', [\App\Http\Controllers\Response\LaptopController::class, 'index'])
             ->name('response.laptops.index');
-Route::get('/response/orders/{order}', [\App\Http\Controllers\Response\OrderController::class, 'show'])
-    ->name('response.orders.show');
+// Route::get('/response/orders/{order}', [\App\Http\Controllers\Response\OrderController::class, 'show'])
+//     ->name('response.orders.show');
         Route::get('/laptops/{laptop}/create-order', [\App\Http\Controllers\Response\LaptopController::class, 'createOrder'])
             ->name('response.laptops.createOrder');
 
@@ -369,11 +369,12 @@ Route::prefix('preparation')
 
         Route::get('/dashboard', [PreparationDashboardController::class, 'index'])
             ->name('preparation.dashboard');
-            
-            
 
-        Route::resource('orders', PreparationOrderController::class)
-            ->middleware('permission:view_orders');
+
+
+    Route::resource('orders', PreparationOrderController::class)
+    ->names('preparation.orders')
+    ->middleware('permission:view_orders');
 
         Route::post('/orders/{order}/mark-preparing', [PreparationOrderController::class, 'markAsPreparing'])
             ->name('preparation.orders.markPreparing')
