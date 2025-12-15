@@ -154,7 +154,7 @@ class AttendanceController extends Controller
         // 🔥 🔥 🔥 إغلاق الجلسات المفتوحة تلقائيًا بعد 8 ساعات كحد أقصى
         $expiredSessions = Attendance::where('user_id', $userId)
             ->whereNull('check_out_at')
-            ->where('check_in_at', '<', now()->subHours(8))
+            ->where('check_in_at', '<', now()->subHours(4))
             ->get();
 
         foreach ($expiredSessions as $session) {
