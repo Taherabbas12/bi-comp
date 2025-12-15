@@ -22,19 +22,17 @@
         --forgotten-btn-bg: linear-gradient(135deg, #f59e0b, #d97706);
     }
 
-    /* ===== Base Styles ===== */
     body {
         background: var(--bg);
         color: var(--text);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
         padding: 0;
-        padding-bottom: var(--bottom-nav-height); /* Space for bottom nav on mobile */
-        direction: rtl; /* Right-to-left */
-        overflow-x: hidden; /* Prevent horizontal scroll */
+        padding-bottom: var(--bottom-nav-height);
+        direction: rtl;
+        overflow-x: hidden;
     }
 
-    /* ===== Header ===== */
     .header {
         background: var(--card);
         padding: 12px 16px;
@@ -47,6 +45,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         border-bottom: 1px solid var(--border);
     }
+
     .page-title {
         font-size: 1.5rem;
         font-weight: 700;
@@ -55,6 +54,7 @@
         -webkit-text-fill-color: transparent;
         margin: 0;
     }
+
     .month-selector {
         background: var(--bg);
         border: 1px solid var(--border);
@@ -64,15 +64,16 @@
         font-size: 0.9rem;
     }
 
-    /* ===== Stats Grid ===== */
     .stats-container {
         padding: 16px;
     }
+
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 12px;
     }
+
     .stat-card {
         background: var(--card);
         border: 1px solid var(--border);
@@ -82,24 +83,35 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s ease;
     }
+
     .stat-card:hover {
         transform: translateY(-2px);
     }
+
     .stat-title {
         font-size: 0.8rem;
         color: var(--text-secondary);
         margin-bottom: 4px;
     }
+
     .stat-value {
         font-size: 1.8rem;
         font-weight: 800;
         margin: 0;
     }
-    .stat-value.green { color: var(--green); }
-    .stat-value.blue { color: var(--blue); }
-    .stat-value.red { color: var(--red); }
 
-    /* ===== Forgotten Session Alert ===== */
+    .stat-value.green {
+        color: var(--green);
+    }
+
+    .stat-value.blue {
+        color: var(--blue);
+    }
+
+    .stat-value.red {
+        color: var(--red);
+    }
+
     .forgotten-alert {
         background: var(--card);
         border: 1px solid var(--yellow);
@@ -113,21 +125,23 @@
         align-items: center;
         gap: 8px;
     }
+
     .forgotten-alert h3 {
         color: var(--yellow);
         margin: 0;
         font-size: 1.1rem;
     }
+
     .forgotten-alert p {
         margin: 0;
         font-size: 0.9rem;
         color: var(--text-secondary);
     }
 
-    /* ===== Calendar View ===== */
     .calendar-container {
         padding: 0 16px 16px 16px;
     }
+
     .calendar-header {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
@@ -135,23 +149,26 @@
         border-bottom: 1px solid var(--border);
         padding: 8px 0;
     }
+
     .calendar-header-day {
         text-align: center;
         font-weight: 600;
         font-size: 0.9rem;
         color: var(--text-secondary);
     }
+
     .calendar-body {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         gap: 8px;
     }
+
     .calendar-day {
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 8px;
         padding: 8px;
-        min-height: 80px; /* Minimum height for mobile */
+        min-height: 80px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -159,26 +176,31 @@
         text-align: center;
         transition: transform 0.2s ease;
     }
+
     .calendar-day:hover {
         transform: scale(1.02);
-        background: #1e293b; /* Slightly lighter on hover */
+        background: #1e293b;
     }
+
     .day-number {
         font-size: 1.1rem;
         font-weight: 700;
         color: var(--blue);
         margin-bottom: 4px;
     }
+
     .duration {
         color: var(--green);
         font-weight: 600;
         font-size: 0.9rem;
         margin-top: 2px;
     }
+
     .no-mark {
         color: var(--red);
         font-size: 1.2rem;
     }
+
     .live-session {
         margin-top: 4px;
         font-size: 0.8rem;
@@ -188,19 +210,21 @@
         padding: 2px 4px;
         border-radius: 4px;
     }
+
     .today {
         outline: 2px solid var(--yellow);
         outline-offset: -2px;
     }
+
     .has-attendance {
         outline: 2px solid var(--green);
         outline-offset: -2px;
     }
+
     .other-month {
         opacity: 0.4;
     }
 
-    /* ===== QR Modal ===== */
     .modal {
         position: fixed;
         top: 0;
@@ -215,9 +239,11 @@
         padding: 20px;
         box-sizing: border-box;
     }
+
     .modal.active {
         display: flex;
     }
+
     .modal-content {
         background: var(--bg);
         border: 1px solid var(--border);
@@ -230,17 +256,20 @@
         display: flex;
         flex-direction: column;
     }
+
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 16px;
     }
+
     .modal-title {
         font-size: 1.2rem;
         font-weight: 700;
         margin: 0;
     }
+
     .switch-btn {
         background: #334155;
         border: none;
@@ -250,70 +279,45 @@
         cursor: pointer;
         font-size: 0.9rem;
     }
+
     .qr-scanner-container {
         width: 100%;
-        max-width: 300px; /* Fixed max width for square */
-        height: 300px; /* Fixed height for square */
-        margin: 0 auto 16px; /* Centered */
+        max-width: 300px;
+        height: 300px;
+        margin: 0 auto 16px;
         position: relative;
         overflow: hidden;
         border-radius: 12px;
-        background-color: #000; /* Black background for video */
+        background-color: #000;
     }
+
     #qr-reader {
         width: 100%;
         height: 100%;
-        display: flex; /* Fallback if video doesn't fill */
+        display: flex;
         align-items: center;
         justify-content: center;
     }
+
     #qr-reader video {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* Cover the container */
+        object-fit: cover;
     }
-    /* Overlay for scanning area */
+
     .qr-overlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        pointer-events: none; /* Allow clicks through to video */
-        box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.5); /* Darken outside the scan area */
+        pointer-events: none;
+        box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.5);
     }
+
     .qr-overlay::before,
-    .qr-overlay::after {
-        content: '';
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-color: var(--green);
-        border-style: solid;
-    }
-    /* Top-left corner */
-    .qr-overlay::before {
-        top: calc(50% - 150px); /* Half of 300px minus corner length */
-        left: calc(50% - 150px);
-        border-width: 0 0 3px 3px;
-    }
-    /* Top-right corner */
-    .qr-overlay::after {
-        top: calc(50% - 150px);
-        right: calc(50% - 150px);
-        border-width: 0 3px 3px 0;
-    }
-    .qr-overlay-bottom-right {
-        content: '';
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-color: var(--green);
-        border-style: solid;
-        bottom: 0;
-        right: 0;
-        border-width: 0 3px 3px 0;
-    }
+    .qr-overlay::after,
+    .qr-overlay-bottom-right,
     .qr-overlay-bottom-left {
         content: '';
         position: absolute;
@@ -321,9 +325,30 @@
         height: 20px;
         border-color: var(--green);
         border-style: solid;
+    }
+
+    .qr-overlay::before {
+        top: calc(50% - 150px);
+        left: calc(50% - 150px);
+        border-width: 0 0 3px 3px;
+    }
+
+    .qr-overlay::after {
+        top: calc(50% - 150px);
+        right: calc(50% - 150px);
+        border-width: 0 3px 3px 0;
+    }
+
+    .qr-overlay-bottom-right {
+        bottom: 0;
+        right: 0;
+        border-width: 3px 0 0 3px;
+    }
+
+    .qr-overlay-bottom-left {
         bottom: 0;
         left: 0;
-        border-width: 3px 0 0 3px;
+        border-width: 0 3px 3px 0;
     }
 
     .close-btn {
@@ -338,7 +363,6 @@
         font-size: 1rem;
     }
 
-    /* ===== Bottom Navigation (Mobile) ===== */
     .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -352,6 +376,7 @@
         z-index: 9999;
         box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
     }
+
     .nav-btn {
         flex: 1;
         max-width: 150px;
@@ -368,46 +393,58 @@
         gap: 4px;
         transition: background 0.2s ease;
     }
+
     .nav-btn-checkin {
         background: var(--primary-btn-bg);
     }
+
     .nav-btn-checkout {
         background: var(--secondary-btn-bg);
     }
+
     .nav-btn-forgotten {
         background: var(--forgotten-btn-bg);
     }
+
     .nav-btn-other {
         background: var(--action-btn-bg);
     }
-    .nav-btn i { /* Assuming you use icon fonts like Font Awesome */
+
+    .nav-btn i {
         font-size: 1.2rem;
     }
 
-    /* ===== Responsive Adjustments ===== */
     @media (min-width: 768px) {
         body {
-            padding-bottom: 0; /* Remove bottom padding on desktop */
+            padding-bottom: 0;
         }
+
         .calendar-day {
-            min-height: 100px; /* Taller cards on desktop */
+            min-height: 100px;
             padding: 12px;
         }
+
         .bottom-nav {
-            display: none; /* Hide bottom nav on desktop */
+            display: none;
         }
+
         .header {
             padding: 16px 24px;
         }
-        .stats-container, .calendar-container {
+
+        .stats-container,
+        .calendar-container {
             padding: 16px 24px;
         }
+
         .page-title {
             font-size: 1.8rem;
         }
+
         .stat-card {
             padding: 16px;
         }
+
         .stat-value {
             font-size: 2rem;
         }
@@ -420,7 +457,10 @@
         <h1 class="page-title">📅 لوحة الحضور</h1>
         <select class="month-selector" id="monthSelector" onchange="changeMonth(this.value)">
             @for ($i = -6; $i <= 6; $i++)
-                @php $date = now()->addMonths($i)->startOfMonth(); $formatted = $date->format('Y-m'); @endphp
+                @php
+                    $date = now()->addMonths($i)->startOfMonth();
+                    $formatted = $date->format('Y-m');
+                @endphp
                 <option value="{{ $formatted }}" {{ $currentMonth->format('Y-m') == $formatted ? 'selected' : '' }}>
                     {{ $date->translatedFormat('F Y') }}
                 </option>
@@ -446,11 +486,13 @@
         </div>
     </div>
 
-    <!-- Forgotten Session Alert -->
-    @if($forgottenSession)
+    <!-- Forgotten Session Alert (نادر جدًا بعد التعديل) -->
+    @if ($forgottenSession)
         <div class="forgotten-alert">
             <h3>⚠️ جلسة مفتوحة من يوم سابق!</h3>
-            <p>تم العثور على جلسة حضور مفتوحة منذ: <strong>{{ $forgottenSession->check_in_at->format('Y-m-d H:i A') }}</strong></p>
+            <p>تم العثور على جلسة حضور مفتوحة منذ:
+                <strong>{{ $forgottenSession->check_in_at->format('Y-m-d H:i A') }}</strong>
+            </p>
             <button class="nav-btn nav-btn-forgotten" onclick="closeForgottenSession()">
                 <i>✅</i> إغلاق الجلسة المنسية
             </button>
@@ -472,31 +514,35 @@
             @php
                 $day = $startOfMonth->copy();
                 $today = now()->toDateString();
-                $currentOpenSession = $openSessions->firstWhere('check_in_at', '>=', now()->startOfDay());
             @endphp
-            @while($day <= $endOfMonth)
-                @for($i = 0; $i < 7; $i++)
+            @while ($day <= $endOfMonth)
+                @for ($i = 0; $i < 7; $i++)
                     @php
                         $d = $day->copy()->addDays($i);
                         $date = $d->toDateString();
-                        $info = $dailyHours[$date] ?? ['total' => 0, 'isCurrentMonth' => false, 'hasAttendance' => false];
+                        $info = $dailyHours[$date] ?? [
+                            'total' => 0,
+                            'isCurrentMonth' => false,
+                            'hasAttendance' => false,
+                        ];
                         $h = floor($info['total']);
                         $m = round(($info['total'] - $h) * 60);
                     @endphp
-                    <div class="calendar-day
+                    <div
+                        class="calendar-day
                         {{ !$info['isCurrentMonth'] ? 'other-month' : '' }}
                         {{ $date == $today ? 'today' : '' }}
                         {{ $info['hasAttendance'] ? 'has-attendance' : '' }}
                     ">
-                        @if($info['isCurrentMonth'])
+                        @if ($info['isCurrentMonth'])
                             <div class="day-number">{{ $d->format('d') }}</div>
-                            @if($info['hasAttendance'])
+                            @if ($info['hasAttendance'])
                                 <div class="duration">{{ $h }}س {{ $m }}د</div>
                             @else
                                 <div class="no-mark">❌</div>
                             @endif
-                            @if($currentOpenSession && $date == $today)
-                                <div class="live-session">⏱ <span id="live-{{ $date }}">00:00:00</span></div>
+                            @if ($currentOpenSession && $date == $today)
+                                <div class="live-session">⏱ <span id="live-{{ $today }}">00:00:00</span></div>
                             @endif
                         @else
                             <div class="day-number">{{ $d->format('d') }}</div>
@@ -535,101 +581,85 @@
         <button class="nav-btn nav-btn-checkout" onclick="openQr('checkout')">
             <i>🚪</i> انصراف
         </button>
-        <!-- Add other common actions here if needed -->
+        <!-- زر "إغلاق جلسة منسية" لا يظهر هنا لأنه يظهر كتنبيه أعلى الصفحة عند الحاجة -->
     </div>
-
 @endsection
 
 @section('scripts')
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
-        let scanner = null, mode = 'checkin', cams = [], camIndex = 0, locked = false;
+        let scanner = null,
+            mode = 'checkin',
+            cams = [],
+            camIndex = 0,
+            locked = false;
 
         function formatTime(seconds) {
             const h = Math.floor(seconds / 3600);
             const m = Math.floor((seconds % 3600) / 60);
             const s = seconds % 60;
-            return [h, m, s]
-                .map(v => v.toString().padStart(2, '0'))
-                .join(':');
+            return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
         }
 
         function openQr(m) {
-            mode = m; locked = false;
+            mode = m;
+            locked = false;
             document.getElementById('qrModalTitle').innerText = m === 'checkin' ? 'مسح رمز الحضور' : 'مسح رمز الانصراف';
             document.getElementById('qrModal').classList.add('active');
 
             setTimeout(() => {
-                if (!document.getElementById('qr-reader')) {
-                    console.error("QR reader element not found!");
-                    return;
-                }
+                if (!document.getElementById('qr-reader')) return;
                 scanner = new Html5Qrcode("qr-reader");
 
                 Html5Qrcode.getCameras().then(list => {
                     cams = list;
-                    camIndex = list.findIndex(c => c.label.toLowerCase().includes('back')) !== -1
-                        ? list.findIndex(c => c.label.toLowerCase().includes('back'))
-                        : 0;
+                    camIndex = list.findIndex(c => c.label.toLowerCase().includes('back')) !== -1 ?
+                        list.findIndex(c => c.label.toLowerCase().includes('back')) :
+                        0;
                     startCam();
                 }).catch(err => {
-                    console.error("Error getting cameras:", err);
-                    alert("خطأ في الوصول إلى الكاميرا: " + err.message);
+                    alert("خطأ في الوصول إلى الكاميرا: " + (err.message || err));
                 });
             }, 100);
         }
 
         function startCam() {
-            const config = {
-                fps: 10,
-                qrbox: { width: 240, height: 240 }, // Slightly smaller than container for overlay
-                aspectRatio: 1.0
-            };
-
             if (cams.length === 0) {
-                console.error("No cameras available.");
                 alert("لا توجد كاميرات متاحة.");
                 return;
             }
 
+            const config = {
+                fps: 10,
+                qrbox: {
+                    width: 240,
+                    height: 240
+                },
+                aspectRatio: 1.0
+            };
             const selectedCameraId = cams[camIndex].id;
-            scanner.start(
-                selectedCameraId,
-                config,
-                (decodedText, decodedResult) => {
-                    if (locked) return;
-                    locked = true;
-                    console.log("QR Code scanned: ", decodedText);
-                    scanner.stop().then(() => {
-                        send(decodedText);
-                    }).catch(err => {
-                        console.error("Error stopping scanner: ", err);
-                        send(decodedText);
-                    });
-                }
-            ).catch(err => {
-                console.error("Error starting camera: ", err);
-                alert("خطأ في بدء الكاميرا: " + err.message);
+
+            scanner.start(selectedCameraId, config, (decodedText) => {
+                if (locked) return;
+                locked = true;
+                scanner.stop().then(() => send(decodedText)).catch(() => send(decodedText));
+            }).catch(err => {
+                alert("خطأ في بدء الكاميرا: " + (err.message || err));
                 closeQr();
             });
         }
 
         function switchCamera() {
             if (!scanner || cams.length < 2) return;
-
             scanner.stop().then(() => {
                 camIndex = (camIndex + 1) % cams.length;
-                startCam();
-            }).catch(err => {
-                console.error("Error switching camera: ", err);
                 startCam();
             });
         }
 
         function closeQr() {
             if (scanner) {
-                scanner.stop().catch(() => {
-                }).finally(() => {
+                scanner.stop().finally(() => {
                     document.getElementById('qrModal').classList.remove('active');
                     locked = false;
                 });
@@ -641,91 +671,72 @@
         function send(qr) {
             navigator.geolocation.getCurrentPosition(
                 pos => {
-                    fetch(
-                        mode === 'checkin' ? '{{ route("attendance.checkin.qr") }}' : '{{ route("attendance.checkout.qr") }}',
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                qr_code: qr,
-                                lat: pos.coords.latitude,
-                                lng: pos.coords.longitude
+                    fetch(mode === 'checkin' ? '{{ route('attendance.checkin.qr') }}' :
+                            '{{ route('attendance.checkout.qr') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    qr_code: qr,
+                                    lat: pos.coords.latitude,
+                                    lng: pos.coords.longitude
+                                })
                             })
-                        }
-                    )
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        location.reload();
-                    })
-                    .catch(error => {
-                        console.error('Fetch Error:', error);
-                        alert('حدث خطأ أثناء الاتصال.');
-                        locked = false;
-                    });
+                        .then(r => r.json())
+                        .then(data => {
+                            alert(data.message);
+                            if (data.status) location.reload();
+                            else locked = false;
+                        })
+                        .catch(() => {
+                            alert('حدث خطأ أثناء الاتصال.');
+                            locked = false;
+                        });
                 },
-                error => {
-                    console.error("Geolocation error:", error);
-                    alert("يرجى السماح بتحديد الموقع الجغرافي للحضور/الانصراف.");
+                () => {
+                    alert("يرجى السماح بتحديد الموقع الجغرافي.");
                     locked = false;
                 }
             );
         }
 
-        // Handle live session timer for today's current session
-        @if($currentOpenSession)
-        (function() {
-            const liveSessionElement = document.getElementById('live-{{ $today }}');
-            if (!liveSessionElement) return;
-
-            const startTime = new Date("{{ $currentOpenSession->check_in_at }}".replace(" ", "T")).getTime();
-            const updateTimer = () => {
-                const currentTime = new Date().getTime();
-                const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-                liveSessionElement.textContent = formatTime(elapsedSeconds);
-            };
-
-            updateTimer();
-            const intervalId = setInterval(updateTimer, 1000);
-
-            window.addEventListener('beforeunload', () => {
-                clearInterval(intervalId);
-            });
-        })();
+        // مؤقّت الجلسة الحية
+        @if ($currentOpenSession)
+            (function() {
+                const el = document.getElementById('live-{{ $today }}');
+                if (!el) return;
+                const start = new Date("{{ $currentOpenSession->check_in_at->toIso8601String() }}").getTime();
+                const update = () => {
+                    const now = new Date().getTime();
+                    const sec = Math.floor((now - start) / 1000);
+                    el.textContent = formatTime(sec);
+                };
+                update();
+                setInterval(update, 1000);
+            })();
         @endif
 
         function closeForgottenSession() {
-            if (confirm("هل أنت متأكد أنك تريد إغلاق الجلسة المنسية؟")) {
-                fetch('{{ route("attendance.handle_forgotten") }}', {
+            if (!confirm("هل أنت متأكد أنك تريد إغلاق الجلسة المنسية؟")) return;
+            fetch('{{ route('attendance.handle_forgotten') }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     }
                 })
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    if (data.status) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert(data.message || "فشل إغلاق الجلسة.");
-                    }
+                    alert(data.message);
+                    if (data.status) location.reload();
                 })
-                .catch(error => {
-                    console.error('Error closing forgotten session:', error);
-                    alert('حدث خطأ أثناء إغلاق الجلسة.');
-                });
-            }
+                .catch(() => alert('حدث خطأ أثناء إغلاق الجلسة.'));
         }
 
         function changeMonth(month) {
-            // Simple redirect example, you might want to use AJAX
-            window.location.href = '{{ route("attendance.dashboard") }}?month=' + month;
+            window.location.href = '{{ route('attendance.dashboard') }}?month=' + month;
         }
-
     </script>
 @endsection

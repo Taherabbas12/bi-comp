@@ -15,39 +15,43 @@ class AttendanceController extends Controller
     public function checkInByQr(Request $request)
     {
         $request->validate([
-            'qr_code'=>'required',
-            'lat'=>'required|numeric',
-            'lng'=>'required|numeric'
+            'qr_code' => 'required',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric'
         ]);
 
-        $qr = AttendanceQrCode::where('code',$request->qr_code)
-            ->where('is_active',true)->first();
+        $qr = AttendanceQrCode::where('code', $request->qr_code)
+            ->where('is_active', true)->first();
 
-        if(!$qr){
-            return response()->json(['status'=>false,'message'=>'QR غير صالح'],422);
+        if (!$qr) {
+            return response()->json(['status' => false, 'message' => 'QR غير صالح'], 422);
         }
 
         $user = Auth::user();
         $now  = now();
 
         $distance = round($this->distanceInMeters(
-            32.4625278,44.3990550,$request->lat,$request->lng
+            32.4625278,
+            44.3990550,
+            $request->lat,
+            $request->lng
         ));
 
-        if($distance > 12){
+        if ($distance > 12) {
             return response()->json([
-                'status'=>false,
-                'message'=>'❌ خارج الشركة',
-                'distance'=>$distance
-            ],403);
+                'status' => false,
+                'message' => '❌ خارج الشركة',
+                'distance' => $distance
+            ], 403);
         }
 
-        // 检查是否有未关闭的会话
-        $existingOpenSession = Attendance::where('user_id',$user->id)->whereNull('check_out_at')->first();
-        if($existingOpenSession){
-            // 如果存在未关闭的会话，根据需求决定是否允许新的签到
-            // 这里返回错误，表示不能重复签到
-            return response()->json(['status'=>false,'message'=>'جلسة مفتوحة موجودة بالفعل'],422);
+        // منع تسجيل حضور جديد إذا كانت هناك جلسة مفتوحة (حتى لو قديمة)
+        $existingOpenSession = Attendance::where('user_id', $user->id)
+            ->whereNull('check_out_at')
+            ->first();
+
+        if ($existingOpenSession) {
+            return response()->json(['status' => false, 'message' => 'جلسة مفتوحة موجودة بالفعل'], 422);
         }
 
         $workDate = $now->hour < 3
@@ -55,52 +59,52 @@ class AttendanceController extends Controller
             : $now->toDateString();
 
         Attendance::create([
-            'id'=>Str::uuid(),
-            'user_id'=>$user->id,
-            'work_date'=>$workDate,
-            'check_in_at'=>$now,
-            'lat'=>$request->lat,
-            'lng'=>$request->lng,
-            'distance_meters'=>$distance,
-            'is_inside_office'=>true,
-            'source'=>'qr'
+            'id' => Str::uuid(),
+            'user_id' => $user->id,
+            'work_date' => $workDate,
+            'check_in_at' => $now,
+            'lat' => $request->lat,
+            'lng' => $request->lng,
+            'distance_meters' => $distance,
+            'is_inside_office' => true,
+            'source' => 'qr'
         ]);
 
-        return response()->json(['status'=>true,'message'=>'✅ تم تسجيل الحضور']);
+        return response()->json(['status' => true, 'message' => '✅ تم تسجيل الحضور']);
     }
 
     /* ===================== CHECK OUT ===================== */
     public function checkOutByQr(Request $request)
     {
         $request->validate([
-            'qr_code'=>'required',
-            'lat'=>'required|numeric',
-            'lng'=>'required|numeric'
+            'qr_code' => 'required',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric'
         ]);
 
         $user = Auth::user();
         $now  = now();
 
-        $attendance = Attendance::where('user_id',$user->id)
+        $attendance = Attendance::where('user_id', $user->id)
             ->whereNull('check_out_at')
-            ->orderByDesc('check_in_at') // 确保获取最新的未签退记录
+            ->orderByDesc('check_in_at')
             ->first();
 
-        if(!$attendance){
-            return response()->json(['status'=>false,'message'=>'لا توجد جلسة مفتوحة'],422);
+        if (!$attendance) {
+            return response()->json(['status' => false, 'message' => 'لا توجد جلسة مفتوحة'], 422);
         }
 
-        if($attendance->check_in_at->diffInMinutes($now) < 30){
-            return response()->json(['status'=>false,'message'=>'❌ الحد الأدنى 30 دقيقة'],422);
+        if ($attendance->check_in_at->diffInMinutes($now) < 30) {
+            return response()->json(['status' => false, 'message' => '❌ الحد الأدنى 30 دقيقة'], 422);
         }
 
         $attendance->update([
-            'check_out_at'=>$now,
-            'lat'=>$request->lat,
-            'lng'=>$request->lng
+            'check_out_at' => $now,
+            'lat' => $request->lat,
+            'lng' => $request->lng
         ]);
 
-        return response()->json(['status'=>true,'message'=>'🚪 تم تسجيل الانصراف']);
+        return response()->json(['status' => true, 'message' => '🚪 تم تسجيل الانصراف']);
     }
 
     /* ===================== HANDLE FORGOTTEN SESSION ===================== */
@@ -109,63 +113,70 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $now = now();
 
-        // 查找最旧的未签退记录
         $openSession = Attendance::where('user_id', $user->id)
             ->whereNull('check_out_at')
-            ->orderByAsc('check_in_at') // 获取最早开始的那个
+            ->orderByAsc('check_in_at')
             ->first();
 
         if (!$openSession) {
-             return response()->json(['status' => false, 'message' => 'لا توجد جلسات مفتوحة لمعالجتها'], 404);
+            return response()->json(['status' => false, 'message' => 'لا توجد جلسات مفتوحة لمعالجتها'], 404);
         }
 
-        // 检查是否是遗忘的会话（签到时间早于今天）
         $sessionStartDate = $openSession->check_in_at->toDateString();
         $today = $now->toDateString();
+
         if ($sessionStartDate >= $today) {
-             return response()->json(['status' => false, 'message' => 'الجلسة المفتوحة الحالية لا يمكن معالجتها كجلسة منسيّة'], 400);
+            return response()->json(['status' => false, 'message' => 'الجلسة المفتوحة الحالية لا يمكن معالجتها كجلسة منسيّة'], 400);
         }
 
-        // 使用当前时间或前一天晚上11点作为签退时间 (可以根据业务需求调整)
-        // 这里使用当前时间作为示例
-        $checkoutTime = $now;
-        // 或者使用前一天晚上11点
-        // $checkoutTime = $openSession->check_in_at->copy()->endOfDay(); // 这可能需要调整逻辑以确保不超过实际日期
-
+        // عند الإغلاق اليدوي، ننهيها الآن
         $openSession->update([
-            'check_out_at' => $checkoutTime,
-            // 可选：更新签退位置为当前位置（如果可用）
-            // 'lat' => $request->lat ?? $openSession->lat,
-            // 'lng' => $request->lng ?? $openSession->lng,
+            'check_out_at' => $now,
         ]);
-
-        // 可选：创建一条新的记录来标记这次手动处理？取决于具体需求。
-        // 例如，可以更新 work_date 或添加备注。
 
         return response()->json(['status' => true, 'message' => '✅ تم إغلاق الجلسة المنسية بنجاح']);
     }
 
-
     /* ===================== DASHBOARD ===================== */
-  public function dashboard(Request $request)
+    public function dashboard(Request $request)
     {
         $userId = Auth::id();
         $month  = $request->input('month', now()->format('Y-m'));
 
-        // Parse the selected month (e.g., '2025-12')
+        // Parse month
         $currentMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-        // Define period: 5th of current month to 4th of next month
         $periodStart  = $currentMonth->copy()->day(5);
         $periodEnd    = $currentMonth->copy()->addMonth()->day(4);
 
         $startOfMonth = $periodStart->copy()->startOfWeek();
         $endOfMonth   = $periodEnd->copy()->endOfWeek();
 
+        // 🔥 🔥 🔥 إغلاق الجلسات المفتوحة تلقائيًا بعد 8 ساعات كحد أقصى
+        $expiredSessions = Attendance::where('user_id', $userId)
+            ->whereNull('check_out_at')
+            ->where('check_in_at', '<', now()->subHours(8))
+            ->get();
+
+        foreach ($expiredSessions as $session) {
+            $autoCheckout = $session->check_in_at->copy()->addHours(8);
+            // لا نسمح بأن يكون وقت الخروج في المستقبل
+            if ($autoCheckout->isFuture()) {
+                $autoCheckout = now();
+            }
+            $session->update(['check_out_at' => $autoCheckout]);
+        }
+
+        // الآن نعيد جلب الجلسات المفتوحة (بعد الإغلاق التلقائي)
+        $openSessions = Attendance::where('user_id', $userId)
+            ->whereNull('check_out_at')
+            ->get();
+
+        // حساب الساعات اليومية
         $dailyHours = [];
         $monthlyTotalHours = 0;
         $day = $startOfMonth->copy();
 
-        while($day <= $endOfMonth){
+        while ($day <= $endOfMonth) {
             $date = $day->toDateString();
             $isInPeriod = $day->between($periodStart, $periodEnd);
 
@@ -176,23 +187,23 @@ class AttendanceController extends Controller
                 'distance' => null
             ];
 
-            if($isInPeriod){
+            if ($isInPeriod) {
                 $records = Attendance::where('user_id', $userId)
                     ->where('work_date', $date)->get();
 
                 $dayTotal = 0;
                 $lastDistance = null;
 
-                foreach($records as $r){
-                    if($r->check_in_at && $r->check_out_at){
+                foreach ($records as $r) {
+                    if ($r->check_in_at && $r->check_out_at) {
                         $dayTotal += $r->check_in_at->floatDiffInHours($r->check_out_at);
                     }
-                    if($r->distance_meters){
+                    if ($r->distance_meters) {
                         $lastDistance = $r->distance_meters;
                     }
                 }
 
-                if($dayTotal > 0){
+                if ($dayTotal > 0) {
                     $dailyHours[$date]['total'] = $dayTotal;
                     $dailyHours[$date]['hasAttendance'] = true;
                     $dailyHours[$date]['distance'] = $lastDistance;
@@ -203,16 +214,13 @@ class AttendanceController extends Controller
             $day->addDay();
         }
 
-        $openSessions = Attendance::where('user_id', $userId)
-            ->whereNull('check_out_at')->get();
-
-        // Check for forgotten session
+        // البحث عن جلسة "منسية" (مفتوحة من يوم سابق)
         $forgottenSession = null;
         $today = now()->toDateString();
         foreach ($openSessions as $session) {
             if ($session->check_in_at->toDateString() < $today) {
-                 $forgottenSession = $session;
-                 break;
+                $forgottenSession = $session;
+                break;
             }
         }
 
@@ -221,26 +229,36 @@ class AttendanceController extends Controller
             ->where('isCurrentMonth', true)
             ->where('hasAttendance', false)->count();
 
-        // Pass currentMonth to the view for the selector
+        // تحديد الجلسة الحالية (لعرض المؤقت الحي)
+        $currentOpenSession = $openSessions->firstWhere('check_in_at', '>=', now()->startOfDay());
+
         return view('employee.attendance.dashboard', compact(
-            'currentMonth', 'periodStart', 'periodEnd',
-            'startOfMonth', 'endOfMonth',
-            'dailyHours', 'monthlyTotalHours',
-            'openSessions', 'forgottenSession',
-            'daysPresent', 'daysAbsent'
+            'currentMonth',
+            'periodStart',
+            'periodEnd',
+            'startOfMonth',
+            'endOfMonth',
+            'dailyHours',
+            'monthlyTotalHours',
+            'openSessions',
+            'forgottenSession',
+            'daysPresent',
+            'daysAbsent',
+            'currentOpenSession'
         ));
     }
+
     /* ===================== DISTANCE ===================== */
-    private function distanceInMeters($lat1,$lon1,$lat2,$lon2):float
+    private function distanceInMeters($lat1, $lon1, $lat2, $lon2): float
     {
-        $earth=6371000;
-        $dLat=deg2rad($lat2-$lat1);
-        $dLon=deg2rad($lon2-$lon1);
+        $earth = 6371000;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
 
-        $a = sin($dLat/2)**2 +
-            cos(deg2rad($lat1))*cos(deg2rad($lat2))*
-            sin($dLon/2)**2;
+        $a = sin($dLat / 2) ** 2 +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) ** 2;
 
-        return $earth*(2*atan2(sqrt($a),sqrt(1-$a)));
+        return $earth * (2 * atan2(sqrt($a), sqrt(1 - $a)));
     }
 }
