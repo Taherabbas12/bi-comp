@@ -24,6 +24,9 @@ class Task extends Model
         'created_by_user_id',
         'priority_id',
         'status_id',
+        'score',            // ← أضف هذا
+        'outcome_rating',   // ← وأضف هذا
+
     ];
 
     // علاقة: المهمة مسند لمستخدم (Employee)

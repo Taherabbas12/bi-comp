@@ -23,6 +23,9 @@ class StoreTaskRequest extends FormRequest
 
             'priority_id' => 'nullable|string|exists:priorities,id',
             'status_id' => 'nullable|string|exists:task_statuses,id',
+            'score' => 'nullable|integer|min:1|max:10',           // ← جديد
+            'outcome_rating' => 'nullable|integer|min:0|max:100',  // ← جديد
+
 
         ];
     }

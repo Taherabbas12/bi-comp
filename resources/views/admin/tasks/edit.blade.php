@@ -6,8 +6,15 @@
             <div class="col-12 col-lg-10">
                 <div class="card text-white bg-dark border-light">
                     <div class="card-header">
-                        <h4 class="mb-0">تعديل المهمة: {{ $task->title }}</h4>
+                        <h4 class="mb-0">تعديل مهمة: {{ $task->title }}</h4>
                     </div>
+                    <style>
+                        select.form-control option,
+                        select.form-select option {
+                            color: #212529 !important;
+                            background-color: white !important;
+                        }
+                    </style>
                     <div class="card-body">
                         <form method="POST" action="{{ route('admin.tasks.update', $task) }}">
                             @csrf
@@ -137,6 +144,34 @@
                                 </div>
                             </div>
 
+                            <!-- 👇 الحقول الجديدة -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="score" class="form-label">التقييم (1-10)</label>
+                                        <input type="number" class="form-control @error('score') is-invalid @enderror"
+                                            id="score" name="score" value="{{ old('score', $task->score) }}"
+                                            min="1" max="10" placeholder="مثال: 8">
+                                        @error('score')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="outcome_rating" class="form-label">تقييم الناتج (0-100)</label>
+                                        <input type="number"
+                                            class="form-control @error('outcome_rating') is-invalid @enderror"
+                                            id="outcome_rating" name="outcome_rating"
+                                            value="{{ old('outcome_rating', $task->outcome_rating) }}" min="0"
+                                            max="100" placeholder="مثال: 95">
+                                        @error('outcome_rating')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="description" class="form-label">التفاصيل</label>
                                 <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
@@ -147,7 +182,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <button type="submit" class="btn btn-primary">تحديث المهمة</button>
+                                <button type="submit" class="btn btn-warning">تحديث المهمة</button>
                                 <a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary">إلغاء</a>
                             </div>
                         </form>

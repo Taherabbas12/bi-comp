@@ -141,6 +141,34 @@
                                 </div>
                             </div>
 
+                            <!-- 👇 الحقول الجديدة -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="score" class="form-label">التقييم (1-10)</label>
+                                        <input type="number" class="form-control @error('score') is-invalid @enderror"
+                                            id="score" name="score" value="{{ old('score') }}" min="1"
+                                            max="10" placeholder="مثال: 8">
+                                        @error('score')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="outcome_rating" class="form-label">تقييم الناتج (0-100)</label>
+                                        <input type="number"
+                                            class="form-control @error('outcome_rating') is-invalid @enderror"
+                                            id="outcome_rating" name="outcome_rating"
+                                            value="{{ old('outcome_rating', 0) }}" min="0" max="100"
+                                            placeholder="مثال: 95">
+                                        @error('outcome_rating')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="description" class="form-label">التفاصيل</label>
                                 <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"

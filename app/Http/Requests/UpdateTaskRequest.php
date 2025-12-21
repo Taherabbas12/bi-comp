@@ -25,6 +25,9 @@ class UpdateTaskRequest extends FormRequest
             'priority_id' => 'sometimes|required|exists:priorities,id',
             'status_id' => 'sometimes|required|exists:task_statuses,id',
             'progress_percentage' => 'sometimes|integer|min:0|max:100',
+            'score' => 'nullable|integer|min:1|max:10',           // ← جديد
+            'outcome_rating' => 'nullable|integer|min:0|max:100',  // ← جديد
+
         ];
     }
 

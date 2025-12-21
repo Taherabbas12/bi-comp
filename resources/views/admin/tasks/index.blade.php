@@ -1,8 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container-fluid"> <!-- 💥 استخدم container-fluid -->
-
+    <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -16,7 +15,7 @@
 
                 <!-- Filters -->
                 <form method="GET" action="{{ route('admin.tasks.index') }}" class="card p-3 mb-4">
-                    <div class="row g-2"> <!-- 💥 استخدم gap (g-2) -->
+                    <div class="row g-2">
                         <div class="col-12 col-md-3">
                             <label for="assigned_to">الموظف</label>
                             <select name="assigned_to" id="assigned_to" class="form-control">
@@ -24,7 +23,8 @@
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}"
                                         {{ request('assigned_to') == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}</option>
+                                        {{ $user->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -35,7 +35,8 @@
                                 @foreach ($statuses as $status)
                                     <option value="{{ $status->id }}"
                                         {{ request('status') == $status->id ? 'selected' : '' }}>
-                                        {{ $status->display_name }}</option>
+                                        {{ $status->display_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -46,7 +47,8 @@
                                 @foreach ($priorities as $priority)
                                     <option value="{{ $priority->id }}"
                                         {{ request('priority') == $priority->id ? 'selected' : '' }}
-                                        style="color: {{ $priority->color_code }}">{{ $priority->display_name }}
+                                        style="color: {{ $priority->color_code }}">
+                                        {{ $priority->display_name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -69,11 +71,11 @@
                 </form>
                 <!-- End Filters -->
 
-                <!-- 💥 عرض الكروت -->
-                <div class="row g-3"> <!-- 💥 استخدم Grid Bootstrap -->
+                <!-- Tasks Grid -->
+                <div class="row g-3">
                     @forelse($tasks as $task)
-                        <div class="col-12 col-lg-6 col-xl-4"> <!-- 💥 كل كرت يأخذ عمودًا حسب حجم الشاشة -->
-                            <div class="card text-white bg-dark border-light h-100"> <!-- 💥 استخدم Bootstrap Card -->
+                        <div class="col-12 col-lg-6 col-xl-4">
+                            <div class="card text-white bg-dark border-light h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $task->title }}</h5>
                                     <p class="card-text">
@@ -101,6 +103,21 @@
                                         <strong>تاريخ الانتهاء:</strong>
                                         {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('Y-m-d') : 'غير محدد' }}
                                     </p>
+
+                                    @if ($task->score)
+                                        <p class="card-text">
+                                            <i class="bi bi-star-fill"></i>
+                                            <strong>التقييم:</strong> {{ $task->score }}/10
+                                        </p>
+                                    @endif
+
+                                    @if ($task->outcome_rating !== null)
+                                        <p class="card-text">
+                                            <i class="bi bi-graph-up"></i>
+                                            <strong>تقييم الناتج:</strong> {{ $task->outcome_rating }}%
+                                        </p>
+                                    @endif
+
                                     <p class="card-text">
                                         <i class="bi bi-bar-chart-fill"></i>
                                         <strong>نسبة الإنجاز:</strong>
@@ -140,33 +157,22 @@
                         </div>
                     @endforelse
                 </div>
-                <!-- 💥 نهاية عرض الكروت -->
-
             </div>
         </div>
     </div>
 
-    <!-- JavaScript لحل مشكلة لون النص في خيارات القائمة المنسدلة -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const filterSelects = document.querySelectorAll('form[method="GET"] select');
-
             filterSelects.forEach(function(select) {
-                updateOptionColors(select);
-            });
-
-            function updateOptionColors(selectElement) {
-                const options = selectElement.querySelectorAll('option');
-
+                const options = select.querySelectorAll('option');
                 options.forEach(function(option) {
-                    const hasColorStyle = option.hasAttribute('style') && option.getAttribute('style')
-                        .includes('color:');
-
-                    if (!hasColorStyle) {
+                    if (!option.hasAttribute('style') || !option.getAttribute('style').includes(
+                            'color:')) {
                         option.style.color = '#212529';
                     }
                 });
-            }
+            });
         });
     </script>
 @endsection
