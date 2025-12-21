@@ -85,6 +85,29 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $now  = now();
 
+        $qr = AttendanceQrCode::where('code', $request->qr_code)
+            ->where('is_active', true)->first();
+
+        if (!$qr) {
+            return response()->json(['status' => false, 'message' => 'QR غير صالح'], 422);
+        }
+
+        $distance = round($this->distanceInMeters(
+            32.4625278,
+            44.3990550,
+            $request->lat,
+            $request->lng
+        ));
+
+        if ($distance > 12) {
+            return response()->json([
+                'status' => false,
+                'message' => '❌ خارج الشركة',
+                'distance' => $distance
+            ], 403);
+        }
+
+        // البحث عن جلسة مفتوحة
         $attendance = Attendance::where('user_id', $user->id)
             ->whereNull('check_out_at')
             ->orderByDesc('check_in_at')
@@ -94,10 +117,30 @@ class AttendanceController extends Controller
             return response()->json(['status' => false, 'message' => 'لا توجد جلسة مفتوحة'], 422);
         }
 
+        // ✅ التحقق: هل الانصراف مسموح به ضمن حدود يوم العمل؟
+        // يوم بدء الجلسة (بحسب قاعدة 03:00 صباحًا)
+        $sessionOperationalDay = $attendance->check_in_at->hour < 3
+            ? $attendance->check_in_at->copy()->subDay()->toDateString()
+            : $attendance->check_in_at->toDateString();
+
+        // وقت الإغلاق المسموح به: 03:00 صباح اليوم التالي
+        $allowedCheckoutTime = Carbon::parse($sessionOperationalDay)
+            ->addDay()
+            ->setTime(3, 0, 0); // 03:00 صباح اليوم التالي
+
+        if ($now->gt($allowedCheckoutTime)) {
+            return response()->json([
+                'status' => false,
+                'message' => '❌ لا يمكن تسجيل الانصراف بعد الساعة 3 صباحًا من اليوم التالي'
+            ], 422);
+        }
+
+        // التحقق من الحد الأدنى (30 دقيقة)
         if ($attendance->check_in_at->diffInMinutes($now) < 30) {
             return response()->json(['status' => false, 'message' => '❌ الحد الأدنى 30 دقيقة'], 422);
         }
 
+        // تحديث الانصراف
         $attendance->update([
             'check_out_at' => $now,
             'lat' => $request->lat,
