@@ -158,13 +158,13 @@ class AttendanceController extends Controller
             ->where('check_in_at', '<', now()->subHours(4))
             ->get();
 
-        foreach ($expiredSessions as $session) {
-            $autoCheckout = $session->check_in_at->copy()->addHours(4); // ⚠️ 4 ساعات كما طلبت سابقًا
-            if ($autoCheckout->isFuture()) {
-                $autoCheckout = now();
-            }
-            $session->update(['check_out_at' => $autoCheckout]);
-        }
+        // foreach ($expiredSessions as $session) {
+        //     $autoCheckout = $session->check_in_at->copy()->addHours(4); // ⚠️ 4 ساعات كما طلبت سابقًا
+        //     if ($autoCheckout->isFuture()) {
+        //         $autoCheckout = now();
+        //     }
+        //     $session->update(['check_out_at' => $autoCheckout]);
+        // }
 
         // الآن نعيد جلب الجلسات المفتوحة (بعد الإغلاق التلقائي)
         $openSessions = Attendance::where('user_id', $userId)
