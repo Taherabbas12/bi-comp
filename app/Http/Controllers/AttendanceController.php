@@ -138,6 +138,7 @@ class AttendanceController extends Controller
     }
 
     /* ===================== DASHBOARD ===================== */
+    /* ===================== DASHBOARD ===================== */
     public function dashboard(Request $request)
     {
         $userId = Auth::id();
@@ -151,15 +152,14 @@ class AttendanceController extends Controller
         $startOfMonth = $periodStart->copy()->startOfWeek();
         $endOfMonth   = $periodEnd->copy()->endOfWeek();
 
-        // 🔥 🔥 🔥 إغلاق الجلسات المفتوحة تلقائيًا بعد 8 ساعات كحد أقصى
+        // 🔥 إغلاق الجلسات المفتوحة تلقائيًا بعد 4 ساعات كحد أقصى (كما في متطلباتك)
         $expiredSessions = Attendance::where('user_id', $userId)
             ->whereNull('check_out_at')
             ->where('check_in_at', '<', now()->subHours(4))
             ->get();
 
         foreach ($expiredSessions as $session) {
-            $autoCheckout = $session->check_in_at->copy()->addHours(8);
-            // لا نسمح بأن يكون وقت الخروج في المستقبل
+            $autoCheckout = $session->check_in_at->copy()->addHours(4); // ⚠️ 4 ساعات كما طلبت سابقًا
             if ($autoCheckout->isFuture()) {
                 $autoCheckout = now();
             }
@@ -171,7 +171,16 @@ class AttendanceController extends Controller
             ->whereNull('check_out_at')
             ->get();
 
-        // حساب الساعات اليومية
+        // دالة مساعدة لتنسيق موقع الدخول/الخروج
+        $formatLocation = function ($lat, $lng) {
+            if ($lat === null || $lng === null) {
+                return 'غير متوفر';
+            }
+            // يمكنك لاحقًا استبدال هذا ببحث عن اسم الفرع
+            return number_format($lat, 4) . ', ' . number_format($lng, 4);
+        };
+
+        // حساب الساعات اليومية مع التفاصيل الكاملة
         $dailyHours = [];
         $monthlyTotalHours = 0;
         $day = $startOfMonth->copy();
@@ -184,29 +193,42 @@ class AttendanceController extends Controller
                 'total' => 0,
                 'isCurrentMonth' => $isInPeriod,
                 'hasAttendance' => false,
-                'distance' => null
+                'check_in_at' => null,
+                'check_out_at' => null,
+                'location_in' => null,
+                'location_out' => null,
             ];
 
             if ($isInPeriod) {
                 $records = Attendance::where('user_id', $userId)
-                    ->where('work_date', $date)->get();
+                    ->where('work_date', $date)
+                    ->orderBy('check_in_at')
+                    ->get();
 
-                $dayTotal = 0;
-                $lastDistance = null;
-
-                foreach ($records as $r) {
-                    if ($r->check_in_at && $r->check_out_at) {
-                        $dayTotal += $r->check_in_at->floatDiffInHours($r->check_out_at);
-                    }
-                    if ($r->distance_meters) {
-                        $lastDistance = $r->distance_meters;
-                    }
-                }
-
-                if ($dayTotal > 0) {
-                    $dailyHours[$date]['total'] = $dayTotal;
+                if ($records->isNotEmpty()) {
                     $dailyHours[$date]['hasAttendance'] = true;
-                    $dailyHours[$date]['distance'] = $lastDistance;
+
+                    // نأخذ أول سجل (عادة يكون سجل واحد في اليوم)
+                    $record = $records->first();
+
+                    $dailyHours[$date]['check_in_at'] = $record->check_in_at;
+                    $dailyHours[$date]['location_in'] = $formatLocation($record->lat, $record->lng);
+
+                    if ($record->check_out_at) {
+                        $dailyHours[$date]['check_out_at'] = $record->check_out_at;
+                        // نستخدم نفس الإحداثيات لأننا لا نخزن موقع الخروج منفصلًا
+                        $dailyHours[$date]['location_out'] = $formatLocation($record->lat, $record->lng);
+                    }
+
+                    // حساب المدة الإجمالية (في حال وجود أكثر من سجل)
+                    $dayTotal = 0;
+                    foreach ($records as $r) {
+                        if ($r->check_in_at && $r->check_out_at) {
+                            $dayTotal += $r->check_in_at->floatDiffInHours($r->check_out_at);
+                        }
+                    }
+
+                    $dailyHours[$date]['total'] = $dayTotal;
                     $monthlyTotalHours += $dayTotal;
                 }
             }
@@ -227,7 +249,8 @@ class AttendanceController extends Controller
         $daysPresent = collect($dailyHours)->where('hasAttendance', true)->count();
         $daysAbsent  = collect($dailyHours)
             ->where('isCurrentMonth', true)
-            ->where('hasAttendance', false)->count();
+            ->where('hasAttendance', false)
+            ->count();
 
         // تحديد الجلسة الحالية (لعرض المؤقت الحي)
         $currentOpenSession = $openSessions->firstWhere('check_in_at', '>=', now()->startOfDay());
