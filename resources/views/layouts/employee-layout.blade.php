@@ -1,5 +1,4 @@
 @php
-    // صلاحيات موظف النظام
     $employeePermissions = [
         'employee_dashboard',
         'view_employee_tasks',
@@ -17,7 +16,6 @@
         'delete_roles',
     ];
 
-    // صلاحيات موظف الردود
     $responsePermissions = [
         'view_response_dashboard',
         'view_orders_for_response',
@@ -55,12 +53,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <title>@yield('title', 'لوحة الموظف')</title>
-
-    <!-- Bootstrap RTL -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-
-    <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -70,14 +65,18 @@
             --neon-blue: #3b82f6;
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
-
             --glass-bg: rgba(15, 23, 42, 0.55);
             --glass-border: rgba(255, 255, 255, 0.08);
-
             --glow-green: 0 0 14px rgba(34, 197, 94, .6);
             --glow-blue: 0 0 20px rgba(59, 130, 246, .6);
-
             --bottom-bg: rgba(2, 6, 23, 0.75);
+            --sidebar-width: 330px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -86,51 +85,55 @@
             font-family: "Tajawal", sans-serif;
             min-height: 100vh;
             width: 100vw;
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            overflow-x: hidden;
         }
 
         /* =============================
-           🖥️ DESKTOP SIDEBAR (Fixed)
+           🖥️ DESKTOP LAYOUT (≥992px)
         ============================= */
         @media (min-width: 992px) {
             body {
-                padding-bottom: 0 !important;
+                padding-bottom: 0;
             }
 
             .desktop-sidebar {
                 position: fixed;
                 top: 0;
                 right: 0;
-                width: 330px;
+                width: var(--sidebar-width);
                 height: 100vh;
                 padding: 28px;
                 background: linear-gradient(155deg, var(--dark1), var(--dark2));
-                border-left: 1px solid rgba(255, 255, 255, .1);
                 box-shadow: var(--glow-green), var(--glow-blue);
+                border-left: 1px solid rgba(255, 255, 255, .1);
                 overflow-y: auto;
                 z-index: 1000;
+                backdrop-filter: blur(12px);
+            }
+
+            .desktop-sidebar h4 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                margin-bottom: 24px;
+                text-align: center;
+                color: var(--text-main);
             }
 
             .content-wrapper {
-                margin-right: 330px;
-                /* Leave space for sidebar */
-                padding: 22px 22px 22px 22px;
-                /* Top padding instead of navbar */
+                margin-right: var(--sidebar-width);
+                padding: 28px;
                 min-height: 100vh;
-                padding-bottom: 22px;
             }
 
             .page-shell {
-                padding: 20px;
+                padding: 24px;
                 border-radius: 22px;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                background: rgba(15, 23, 42, .65);
+                border: 1px solid var(--glass-border);
+                background: var(--glass-bg);
                 box-shadow: 0 0 22px rgba(0, 0, 0, .55);
+                backdrop-filter: blur(16px);
             }
 
-            /* Hide mobile-only elements on desktop */
             .top-navbar,
             .bottom-nav,
             #openDrawer {
@@ -139,7 +142,7 @@
         }
 
         /* =============================
-           📱 MOBILE LAYOUT (Default)
+           📱 MOBILE LAYOUT (<992px)
         ============================= */
         @media (max-width: 991.98px) {
             body {
@@ -164,7 +167,6 @@
                 font-weight: 800;
             }
 
-            /* Drawer (Mobile Only) */
             #drawerOverlay {
                 position: fixed;
                 inset: 0;
@@ -178,7 +180,7 @@
             }
 
             #drawer {
-                width: 330px;
+                width: var(--sidebar-width);
                 height: 100vh;
                 position: fixed;
                 right: -350px;
@@ -194,41 +196,6 @@
 
             #drawer.open {
                 right: 0;
-            }
-
-            .drawer-link {
-                display: flex;
-                align-items: center;
-                padding: 20px;
-                margin-bottom: 14px;
-                border-radius: 16px;
-                background: rgba(255, 255, 255, 0.05);
-                color: var(--text-main);
-                text-decoration: none;
-                gap: 18px;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                transition: .25s;
-            }
-
-            .drawer-link:hover {
-                background: rgba(34, 197, 94, .22);
-                border-color: rgba(34, 197, 94, .45);
-            }
-
-            .drawer-link.active {
-                background: linear-gradient(135deg, rgba(34, 197, 94, .3), rgba(59, 130, 246, .3));
-                box-shadow: var(--glow-green), var(--glow-blue);
-                border-color: rgba(34, 197, 94, .6);
-            }
-
-            .drawer-icon {
-                width: 46px;
-                height: 46px;
-                border-radius: 14px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(255, 255, 255, 0.08);
             }
 
             .content-wrapper {
@@ -290,12 +257,50 @@
                 background: linear-gradient(135deg, rgba(34, 197, 94, .2), rgba(59, 130, 246, .2));
             }
         }
+
+        /* =============================
+           🔗 SHARED DRAWER LINK STYLE (Mobile + Desktop)
+        ============================= */
+        .drawer-link {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            text-decoration: none;
+            gap: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: .25s;
+        }
+
+        .drawer-link:hover {
+            background: rgba(34, 197, 94, .22);
+            border-color: rgba(34, 197, 94, .45);
+        }
+
+        .drawer-link.active {
+            background: linear-gradient(135deg, rgba(34, 197, 94, .3), rgba(59, 130, 246, .3));
+            box-shadow: var(--glow-green), var(--glow-blue);
+            border-color: rgba(34, 197, 94, .6);
+        }
+
+        .drawer-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+        }
     </style>
 </head>
 
 <body>
 
-    {{-- DESKTOP SIDEBAR (Visible only on lg and up) --}}
+    {{-- DESKTOP SIDEBAR - نفس دزاين الموبايل تمامًا --}}
     <aside class="desktop-sidebar d-none d-lg-block">
         <h4 class="mb-4 text-center">قائمة الموظف</h4>
 
@@ -305,7 +310,6 @@
                 <div class="drawer-icon"><i class="bi bi-speedometer2"></i></div>
                 الرئيسية
             </a>
-
             <a href="{{ route('employee.tasks.index') }}"
                 class="drawer-link {{ request()->routeIs('employee.tasks.*') ? 'active' : '' }}">
                 <div class="drawer-icon"><i class="bi bi-list-check"></i></div>
@@ -319,13 +323,11 @@
                 <div class="drawer-icon"><i class="bi bi-chat-dots"></i></div>
                 لوحة الردود
             </a>
-
             <a href="{{ route('response.orders.index') }}"
                 class="drawer-link {{ request()->routeIs('response.orders.*') ? 'active' : '' }}">
                 <div class="drawer-icon"><i class="bi bi-bag-check"></i></div>
                 الطلبات
             </a>
-
             <a href="{{ route('response.laptops.index') }}"
                 class="drawer-link {{ request()->routeIs('response.laptops.*') ? 'active' : '' }}">
                 <div class="drawer-icon"><i class="bi bi-laptop"></i></div>
@@ -343,7 +345,7 @@
     {{-- MOBILE NAVBAR --}}
     <header class="top-navbar d-lg-none">
         <div class="top-navbar-title">@yield('title')</div>
-        <button id="openDrawer" class="btn btn-outline-light">
+        <button id="openDrawer" class="btn btn-outline-light d-lg-none">
             <i class="bi bi-list fs-3"></i>
         </button>
     </header>
@@ -359,7 +361,6 @@
                 <div class="drawer-icon"><i class="bi bi-speedometer2"></i></div>
                 الرئيسية
             </a>
-
             <a href="{{ route('employee.tasks.index') }}"
                 class="drawer-link {{ request()->routeIs('employee.tasks.*') ? 'active' : '' }}">
                 <div class="drawer-icon"><i class="bi bi-list-check"></i></div>
@@ -373,13 +374,11 @@
                 <div class="drawer-icon"><i class="bi bi-chat-dots"></i></div>
                 لوحة الردود
             </a>
-
             <a href="{{ route('response.orders.index') }}"
                 class="drawer-link {{ request()->routeIs('response.orders.*') ? 'active' : '' }}">
                 <div class="drawer-icon"><i class="bi bi-bag-check"></i></div>
                 الطلبات
             </a>
-
             <a href="{{ route('response.laptops.index') }}"
                 class="drawer-link {{ request()->routeIs('response.laptops.*') ? 'active' : '' }}">
                 <div class="drawer-icon"><i class="bi bi-laptop"></i></div>
@@ -443,7 +442,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             const drawer = document.getElementById("drawer");
             const overlay = document.getElementById("drawerOverlay");
             const openBtn = document.getElementById("openDrawer");
