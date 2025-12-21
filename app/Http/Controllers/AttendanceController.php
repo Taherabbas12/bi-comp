@@ -142,45 +142,61 @@ class AttendanceController extends Controller
     public function dashboard(Request $request)
     {
         $userId = Auth::id();
-        $month  = $request->input('month', now()->format('Y-m'));
+        $now = now();
+        $month = $request->input('month', $now->format('Y-m'));
 
-        // Parse month
+        // حساب "اليوم العملي" الحالي (يبدأ من 03:00 صباحًا)
+        $currentOperationalDay = $now->hour < 3
+            ? $now->copy()->subDay()->toDateString()
+            : $now->toDateString();
+
+        // Parse month for display (يبدأ من 5 من كل شهر)
         $currentMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-        $periodStart  = $currentMonth->copy()->day(5);
-        $periodEnd    = $currentMonth->copy()->addMonth()->day(4);
+        $periodStart = $currentMonth->copy()->day(6);
+        $periodEnd = $currentMonth->copy()->addMonth()->day(5);
 
         $startOfMonth = $periodStart->copy()->startOfWeek();
-        $endOfMonth   = $periodEnd->copy()->endOfWeek();
+        $endOfMonth = $periodEnd->copy()->endOfWeek();
 
-        // 🔥 إغلاق الجلسات المفتوحة تلقائيًا بعد 4 ساعات كحد أقصى (كما في متطلباتك)
-        $expiredSessions = Attendance::where('user_id', $userId)
+        // 🔥 🔥 🔥 إغلاق الجلسات المنسية تلقائيًا (بعد مرور اليوم العملي التالي)
+        $openSessions = Attendance::where('user_id', $userId)
             ->whereNull('check_out_at')
-            ->where('check_in_at', '<', now()->subHours(4))
+            ->orderBy('check_in_at')
             ->get();
 
-        // foreach ($expiredSessions as $session) {
-        //     $autoCheckout = $session->check_in_at->copy()->addHours(4); // ⚠️ 4 ساعات كما طلبت سابقًا
-        //     if ($autoCheckout->isFuture()) {
-        //         $autoCheckout = now();
-        //     }
-        //     $session->update(['check_out_at' => $autoCheckout]);
-        // }
+        foreach ($openSessions as $session) {
+            // حساب "اليوم العملي" لبداية الجلسة
+            $sessionOperationalDay = $session->check_in_at->hour < 3
+                ? $session->check_in_at->copy()->subDay()->toDateString()
+                : $session->check_in_at->toDateString();
 
-        // الآن نعيد جلب الجلسات المفتوحة (بعد الإغلاق التلقائي)
+            // إذا كان يوم الجلسة < اليوم العملي الحالي → فهي منسية ويجب إغلاقها
+            if ($sessionOperationalDay < $currentOperationalDay) {
+                // وقت الإغلاق: بداية اليوم التالي عند 03:00 صباحًا (أو الآن إذا كان أقرب)
+                $autoCloseTime = Carbon::parse($sessionOperationalDay)
+                    ->addDay()
+                    ->setTime(3, 0, 0); // 03:00 صباح اليوم التالي
+
+                if ($autoCloseTime->isFuture()) {
+                    $autoCloseTime = $now;
+                }
+
+                $session->update(['check_out_at' => $autoCloseTime]);
+            }
+        }
+
+        // بعد الإغلاق التلقائي، نعيد جلب الجلسات المفتوحة
         $openSessions = Attendance::where('user_id', $userId)
             ->whereNull('check_out_at')
             ->get();
 
-        // دالة مساعدة لتنسيق موقع الدخول/الخروج
+        // دالة مساعدة لتنسيق الموقع
         $formatLocation = function ($lat, $lng) {
-            if ($lat === null || $lng === null) {
-                return 'غير متوفر';
-            }
-            // يمكنك لاحقًا استبدال هذا ببحث عن اسم الفرع
+            if ($lat === null || $lng === null) return 'غير متوفر';
             return number_format($lat, 4) . ', ' . number_format($lng, 4);
         };
 
-        // حساب الساعات اليومية مع التفاصيل الكاملة
+        // حساب الساعات اليومية
         $dailyHours = [];
         $monthlyTotalHours = 0;
         $day = $startOfMonth->copy();
@@ -207,8 +223,6 @@ class AttendanceController extends Controller
 
                 if ($records->isNotEmpty()) {
                     $dailyHours[$date]['hasAttendance'] = true;
-
-                    // نأخذ أول سجل (عادة يكون سجل واحد في اليوم)
                     $record = $records->first();
 
                     $dailyHours[$date]['check_in_at'] = $record->check_in_at;
@@ -216,11 +230,9 @@ class AttendanceController extends Controller
 
                     if ($record->check_out_at) {
                         $dailyHours[$date]['check_out_at'] = $record->check_out_at;
-                        // نستخدم نفس الإحداثيات لأننا لا نخزن موقع الخروج منفصلًا
                         $dailyHours[$date]['location_out'] = $formatLocation($record->lat, $record->lng);
                     }
 
-                    // حساب المدة الإجمالية (في حال وجود أكثر من سجل)
                     $dayTotal = 0;
                     foreach ($records as $r) {
                         if ($r->check_in_at && $r->check_out_at) {
@@ -236,24 +248,34 @@ class AttendanceController extends Controller
             $day->addDay();
         }
 
-        // البحث عن جلسة "منسية" (مفتوحة من يوم سابق)
+        // البحث عن جلسة "منسية" (مفتوحة من يوم عملي سابق) — للتنبيه فقط
         $forgottenSession = null;
-        $today = now()->toDateString();
+        $todayOperational = $now->hour < 3 ? $now->copy()->subDay()->toDateString() : $now->toDateString();
         foreach ($openSessions as $session) {
-            if ($session->check_in_at->toDateString() < $today) {
+            $sessionDay = $session->check_in_at->hour < 3
+                ? $session->check_in_at->copy()->subDay()->toDateString()
+                : $session->check_in_at->toDateString();
+
+            if ($sessionDay < $todayOperational) {
                 $forgottenSession = $session;
                 break;
             }
         }
 
         $daysPresent = collect($dailyHours)->where('hasAttendance', true)->count();
-        $daysAbsent  = collect($dailyHours)
+        $daysAbsent = collect($dailyHours)
             ->where('isCurrentMonth', true)
             ->where('hasAttendance', false)
             ->count();
 
-        // تحديد الجلسة الحالية (لعرض المؤقت الحي)
-        $currentOpenSession = $openSessions->firstWhere('check_in_at', '>=', now()->startOfDay());
+        // الجلسة الحالية (للمؤقت الحي)
+        $currentOpenSession = $openSessions->firstWhere(function ($session) use ($now) {
+            $sessionDay = $session->check_in_at->hour < 3
+                ? $session->check_in_at->copy()->subDay()->toDateString()
+                : $session->check_in_at->toDateString();
+            $today = $now->hour < 3 ? $now->copy()->subDay()->toDateString() : $now->toDateString();
+            return $sessionDay === $today;
+        });
 
         return view('employee.attendance.dashboard', compact(
             'currentMonth',
