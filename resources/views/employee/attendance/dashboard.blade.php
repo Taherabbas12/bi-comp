@@ -175,11 +175,13 @@
         justify-content: flex-start;
         text-align: center;
         transition: transform 0.2s ease;
+        position: relative;
     }
 
     .calendar-day:hover {
         transform: scale(1.02);
         background: #1e293b;
+        z-index: 2;
     }
 
     .day-number {
@@ -225,6 +227,63 @@
         opacity: 0.4;
     }
 
+    /* =============================
+       🪄 HOVER TOOLTIP (NEW)
+    ============================= */
+    .attendance-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        width: 220px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        z-index: 10;
+        display: none;
+        direction: rtl;
+        font-size: 0.9rem;
+        backdrop-filter: blur(8px);
+        margin-bottom: 8px;
+    }
+
+    .calendar-day:hover .attendance-tooltip {
+        display: block;
+    }
+
+    .tooltip-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 4px 0;
+    }
+
+    .tooltip-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .tooltip-value {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    .tooltip-value.in {
+        color: var(--green);
+    }
+
+    .tooltip-value.out {
+        color: var(--red);
+    }
+
+    .tooltip-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 6px 0;
+    }
+
+    /* Modal & Bottom Nav (unchanged) */
     .modal {
         position: fixed;
         top: 0;
@@ -486,7 +545,7 @@
         </div>
     </div>
 
-    <!-- Forgotten Session Alert (نادر جدًا بعد التعديل) -->
+    <!-- Forgotten Session Alert -->
     @if ($forgottenSession)
         <div class="forgotten-alert">
             <h3>⚠️ جلسة مفتوحة من يوم سابق!</h3>
@@ -524,6 +583,10 @@
                             'total' => 0,
                             'isCurrentMonth' => false,
                             'hasAttendance' => false,
+                            'check_in_at' => null,
+                            'check_out_at' => null,
+                            'location_in' => null,
+                            'location_out' => null,
                         ];
                         $h = floor($info['total']);
                         $m = round(($info['total'] - $h) * 60);
@@ -532,8 +595,7 @@
                         class="calendar-day
                         {{ !$info['isCurrentMonth'] ? 'other-month' : '' }}
                         {{ $date == $today ? 'today' : '' }}
-                        {{ $info['hasAttendance'] ? 'has-attendance' : '' }}
-                    ">
+                        {{ $info['hasAttendance'] ? 'has-attendance' : '' }}">
                         @if ($info['isCurrentMonth'])
                             <div class="day-number">{{ $d->format('d') }}</div>
                             @if ($info['hasAttendance'])
@@ -546,6 +608,38 @@
                             @endif
                         @else
                             <div class="day-number">{{ $d->format('d') }}</div>
+                        @endif
+
+                        {{-- Tooltip - يظهر فقط عند التمرير على يوم فيه حضور --}}
+                        @if ($info['hasAttendance'])
+                            <div class="attendance-tooltip">
+                                <div class="tooltip-row">
+                                    <span class="tooltip-label">الدخول:</span>
+                                    <span
+                                        class="tooltip-value in">{{ $info['check_in_at'] ? $info['check_in_at']->format('h:i A') : '—' }}</span>
+                                </div>
+                                <div class="tooltip-row">
+                                    <span class="tooltip-label">الموقع:</span>
+                                    <span class="tooltip-value">{{ $info['location_in'] ?? 'غير متوفر' }}</span>
+                                </div>
+                                <div class="tooltip-divider"></div>
+                                <div class="tooltip-row">
+                                    <span class="tooltip-label">الخروج:</span>
+                                    <span
+                                        class="tooltip-value out">{{ $info['check_out_at'] ? $info['check_out_at']->format('h:i A') : 'لم يخرج بعد' }}</span>
+                                </div>
+                                @if ($info['check_out_at'])
+                                    <div class="tooltip-row">
+                                        <span class="tooltip-label">الموقع:</span>
+                                        <span class="tooltip-value">{{ $info['location_out'] ?? 'غير متوفر' }}</span>
+                                    </div>
+                                @endif
+                                <div class="tooltip-divider"></div>
+                                <div class="tooltip-row">
+                                    <span class="tooltip-label">المدة:</span>
+                                    <span class="tooltip-value">{{ $h }}س {{ $m }}د</span>
+                                </div>
+                            </div>
                         @endif
                     </div>
                 @endfor
@@ -581,7 +675,6 @@
         <button class="nav-btn nav-btn-checkout" onclick="openQr('checkout')">
             <i>🚪</i> انصراف
         </button>
-        <!-- زر "إغلاق جلسة منسية" لا يظهر هنا لأنه يظهر كتنبيه أعلى الصفحة عند الحاجة -->
     </div>
 @endsection
 
@@ -702,7 +795,7 @@
             );
         }
 
-        // مؤقّت الجلسة الحية
+        // Live session timer
         @if ($currentOpenSession)
             (function() {
                 const el = document.getElementById('live-{{ $today }}');
