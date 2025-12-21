@@ -25,11 +25,20 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'id', // <-- إضافة 'id' إذا كنت ترغب في تعيينه يدويًا
+        'id',
         'name',
         'email',
         'password',
-        'role_id', // <-- إضافة 'role_id' كحقل قابل للتعبئة
+        'role_id',
+
+        // ✅ بيانات إضافية
+        'phone',
+        'telegram_id',
+        'address',
+        'birth_date',
+        'gender',
+        'national_id',
+        'notes',
     ];
 
     /**
@@ -49,6 +58,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'birth_date' => 'date',
         'password' => 'hashed',
     ];
 

@@ -58,6 +58,14 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
             'role_id' => 'nullable|exists:roles,id',
+
+            'phone' => 'nullable|string|max:20',
+            'telegram_id' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date',
+            'gender' => 'nullable|in:male,female',
+            'national_id' => 'nullable|string|max:50',
+            'notes' => 'nullable|string',
         ]);
 
         $user = User::create([
@@ -65,8 +73,15 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'role_id' => $request->role_id,
-        ]);
 
+            'phone' => $request->phone,
+            'telegram_id' => $request->telegram_id,
+            'address' => $request->address,
+            'birth_date' => $request->birth_date,
+            'gender' => $request->gender,
+            'national_id' => $request->national_id,
+            'notes' => $request->notes,
+        ]);
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
@@ -85,15 +100,30 @@ class UserController extends Controller
         // middleware: permission:edit_users
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'role_id' => 'nullable|exists:roles,id',
+
+            'phone' => 'nullable|string|max:20',
+            'telegram_id' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date',
+            'gender' => 'nullable|in:male,female',
+            'national_id' => 'nullable|string|max:50',
+            'notes' => 'nullable|string',
         ]);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role_id' => $request->role_id,
-        ]);
+        $user->update($request->only([
+            'name',
+            'email',
+            'role_id',
+            'phone',
+            'telegram_id',
+            'address',
+            'birth_date',
+            'gender',
+            'national_id',
+            'notes',
+        ]));
 
         if ($request->filled('password')) {
             $request->validate(['password' => 'min:8|confirmed']);

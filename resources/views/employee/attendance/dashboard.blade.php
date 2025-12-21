@@ -422,55 +422,59 @@
         font-size: 1rem;
     }
 
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: var(--card);
-        border-top: 1px solid var(--border);
+    /* =============================
+       ⬆️ TOP ACTION BUTTONS
+    ============================= */
+    .header-actions {
         display: flex;
-        justify-content: space-around;
-        padding: 8px 0;
-        z-index: 9999;
-        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .nav-btn {
-        flex: 1;
-        max-width: 150px;
-        padding: 10px 16px;
-        border: none;
-        border-radius: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        color: white;
-        font-size: 0.9rem;
-        display: flex;
-        flex-direction: column;
+        gap: 10px;
         align-items: center;
-        gap: 4px;
-        transition: background 0.2s ease;
     }
 
-    .nav-btn-checkin {
+    .header-btn {
+        padding: 8px 14px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .header-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, .3);
+    }
+
+    .header-btn-checkin {
         background: var(--primary-btn-bg);
     }
 
-    .nav-btn-checkout {
+    .header-btn-checkout {
         background: var(--secondary-btn-bg);
     }
 
-    .nav-btn-forgotten {
-        background: var(--forgotten-btn-bg);
-    }
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
 
-    .nav-btn-other {
-        background: var(--action-btn-bg);
-    }
+        .header-actions {
+            justify-content: space-between;
+        }
 
-    .nav-btn i {
-        font-size: 1.2rem;
+        .header-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
     }
 
     @media (min-width: 768px) {
@@ -514,17 +518,28 @@
     <!-- Header -->
     <div class="header">
         <h1 class="page-title">📅 لوحة الحضور</h1>
-        <select class="month-selector" id="monthSelector" onchange="changeMonth(this.value)">
-            @for ($i = -6; $i <= 6; $i++)
-                @php
-                    $date = now()->addMonths($i)->startOfMonth();
-                    $formatted = $date->format('Y-m');
-                @endphp
-                <option value="{{ $formatted }}" {{ $currentMonth->format('Y-m') == $formatted ? 'selected' : '' }}>
-                    {{ $date->translatedFormat('F Y') }}
-                </option>
-            @endfor
-        </select>
+
+        <div class="header-actions">
+            <button class="header-btn header-btn-checkin" onclick="openQr('checkin')">
+                ✅ حضور
+            </button>
+
+            <button class="header-btn header-btn-checkout" onclick="openQr('checkout')">
+                🚪 انصراف
+            </button>
+
+            <select class="month-selector" id="monthSelector" onchange="changeMonth(this.value)">
+                @for ($i = -6; $i <= 6; $i++)
+                    @php
+                        $date = now()->addMonths($i)->startOfMonth();
+                        $formatted = $date->format('Y-m');
+                    @endphp
+                    <option value="{{ $formatted }}" {{ $currentMonth->format('Y-m') == $formatted ? 'selected' : '' }}>
+                        {{ $date->translatedFormat('F Y') }}
+                    </option>
+                @endfor
+            </select>
+        </div>
     </div>
 
     <!-- Stats -->
@@ -667,15 +682,6 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation (Mobile) -->
-    <div class="bottom-nav">
-        <button class="nav-btn nav-btn-checkin" onclick="openQr('checkin')">
-            <i>✅</i> حضور
-        </button>
-        <button class="nav-btn nav-btn-checkout" onclick="openQr('checkout')">
-            <i>🚪</i> انصراف
-        </button>
-    </div>
 @endsection
 
 @section('scripts')

@@ -8,7 +8,7 @@ class UpdateTaskRequest extends FormRequest
 {
     public function authorize()
     {
-        return true; // or check permission, maybe check if user can edit this specific task
+        return true;
     }
 
     public function rules()
