@@ -9,13 +9,25 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // صلاحية: view_users (يجب أن تكون معرفة في جدول permissions)
-        // middleware: permission:view_users (مطبق في routes/web.php)
-        $users = User::with('role')->paginate(10); // جلب المستخدمين مع دورهم
+        $search = $request->get('search');
 
-        return view('admin.users.index', compact('users'));
+        $users = User::with('role')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('telegram_id', 'like', "%{$search}%")
+                        ->orWhere('national_id', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(9)
+            ->withQueryString(); // مهم حتى لا يضيع البحث مع الصفحات
+
+        return view('admin.users.index', compact('users', 'search'));
     }
 
     public function create()

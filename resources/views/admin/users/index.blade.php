@@ -7,7 +7,7 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
             <div>
                 <h1 class="h4 mb-1">👥 إدارة المستخدمين</h1>
-                <small class="text-muted">عرض وتعديل المستخدمين</small>
+                <small class="text-muted">عرض، بحث، وتعديل الموظفين</small>
             </div>
 
             <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
@@ -15,6 +15,30 @@
             </a>
         </div>
 
+        <!-- Search -->
+        <form method="GET" action="{{ route('admin.users.index') }}" class="mb-3">
+            <div class="row g-2">
+                <div class="col-12 col-md-8">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        class="form-control form-control-sm"
+                        placeholder="🔍 ابحث بالاسم، البريد، الهاتف، التلكرام، الرقم الوطني">
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <button class="btn btn-sm btn-primary w-100">
+                        بحث
+                    </button>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary w-100">
+                        مسح
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Success Message -->
         @if (session('success'))
             <div class="alert alert-success py-2">
                 {{ session('success') }}
@@ -26,7 +50,6 @@
             @forelse($users as $user)
                 <div class="col-12 col-md-6 col-xl-4">
                     <div class="card text-white bg-dark border-light h-100 shadow-sm">
-
                         <div class="card-body d-flex flex-column">
 
                             <!-- Name & Role -->
@@ -75,7 +98,7 @@
             @empty
                 <div class="col-12 text-center text-muted py-5">
                     <i class="bi bi-people fs-1"></i>
-                    <p class="mt-2">لا توجد بيانات</p>
+                    <p class="mt-2">لا توجد نتائج</p>
                 </div>
             @endforelse
         </div>
@@ -87,7 +110,7 @@
 
     </div>
 
-    <!-- FIX MOBILE UI -->
+    <!-- Mobile Fix -->
     <style>
         .grid-actions {
             grid-template-columns: repeat(3, 1fr);
