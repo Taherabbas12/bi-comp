@@ -2,20 +2,24 @@
 
 @section('content')
     <div class="container-fluid">
+
         <div class="row justify-content-center">
             <div class="col-12 col-lg-8">
+
                 <div class="card text-white bg-dark border-light shadow-sm">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h1 class="h5 mb-0">👤 تفاصيل المستخدم</h1>
+
+                    <!-- Header -->
+                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                        <h6 class="mb-0">👤 تفاصيل المستخدم</h6>
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </div>
 
+                    <!-- Body -->
                     <div class="card-body">
                         <div class="row g-3">
 
-                            {{-- العمود الأول --}}
                             <div class="col-12 col-md-6">
                                 <p><strong>👤 الاسم:</strong><br>{{ $user->name }}</p>
                                 <p><strong>📧 البريد:</strong><br>{{ $user->email }}</p>
@@ -23,7 +27,6 @@
                                 <p><strong>✈️ التلكرام:</strong><br>{{ $user->telegram_id ?? '—' }}</p>
                             </div>
 
-                            {{-- العمود الثاني --}}
                             <div class="col-12 col-md-6">
                                 <p><strong>🎂 تاريخ الميلاد:</strong><br>{{ $user->birth_date ?? '—' }}</p>
                                 <p><strong>🚻 الجنس:</strong><br>
@@ -51,17 +54,19 @@
 
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                        <!-- Footer -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
                                 ← رجوع
                             </a>
                             <small class="text-muted">
-                                أنشئ في {{ $user->created_at->format('Y-m-d') }}
+                                {{ $user->created_at->format('Y-m-d') }}
                             </small>
                         </div>
 
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
