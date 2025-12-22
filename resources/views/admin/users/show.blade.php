@@ -4,50 +4,62 @@
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-8">
-                <div class="card text-white bg-dark border-light">
-                    <div class="card-header">
-                        <h1 class="h4 mb-0">👤 عرض المستخدم</h1>
+                <div class="card text-white bg-dark border-light shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h1 class="h5 mb-0">👤 تفاصيل المستخدم</h1>
+                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
                     </div>
+
                     <div class="card-body">
-                        <p class="card-text text-muted mb-4">عرض تفاصيل المستخدم: {{ $user->name }}</p>
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <p class="card-text">
-                                    <i class="bi bi-person"></i>
-                                    <strong>الاسم:</strong> {{ $user->name }}
-                                </p>
-                                <p class="card-text">
-                                    <i class="bi bi-envelope"></i>
-                                    <strong>البريد الإلكتروني:</strong> {{ $user->email }}
-                                </p>
+
+                            {{-- العمود الأول --}}
+                            <div class="col-12 col-md-6">
+                                <p><strong>👤 الاسم:</strong><br>{{ $user->name }}</p>
+                                <p><strong>📧 البريد:</strong><br>{{ $user->email }}</p>
+                                <p><strong>📞 الهاتف:</strong><br>{{ $user->phone ?? '—' }}</p>
+                                <p><strong>✈️ التلكرام:</strong><br>{{ $user->telegram_id ?? '—' }}</p>
                             </div>
-                            <div class="col-md-6">
-                                <p class="card-text">
-                                    <i class="bi bi-calendar-check"></i>
-                                    <strong>تاريخ الإنشاء:</strong> {{ $user->created_at->format('Y-m-d H:i:s') }}
+
+                            {{-- العمود الثاني --}}
+                            <div class="col-12 col-md-6">
+                                <p><strong>🎂 تاريخ الميلاد:</strong><br>{{ $user->birth_date ?? '—' }}</p>
+                                <p><strong>🚻 الجنس:</strong><br>
+                                    {{ $user->gender == 'male' ? 'ذكر' : ($user->gender == 'female' ? 'أنثى' : '—') }}
                                 </p>
-                                <p class="card-text">
-                                    <i class="bi bi-calendar-x"></i>
-                                    <strong>آخر تحديث:</strong> {{ $user->updated_at->format('Y-m-d H:i:s') }}
-                                </p>
+                                <p><strong>🆔 الرقم الوطني:</strong><br>{{ $user->national_id ?? '—' }}</p>
+                                <p><strong>📍 العنوان:</strong><br>{{ $user->address ?? '—' }}</p>
                             </div>
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <p class="card-text">
-                                    <i class="bi bi-person-badge"></i>
-                                    <strong>الدور:</strong>
+
+                            <div class="col-12">
+                                <hr class="border-secondary">
+                                <p><strong>📝 ملاحظات:</strong><br>{{ $user->notes ?? '—' }}</p>
+                            </div>
+
+                            <div class="col-12">
+                                <p>
+                                    <strong>🎭 الدور:</strong>
                                     @if ($user->role)
                                         <span class="badge bg-primary">{{ $user->role->name }}</span>
                                     @else
-                                        <span class="text-muted">غير معين</span>
+                                        <span class="badge bg-secondary">غير معين</span>
                                     @endif
                                 </p>
                             </div>
+
                         </div>
-                        <div class="mt-3">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">العودة إلى القائمة</a>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                                ← رجوع
+                            </a>
+                            <small class="text-muted">
+                                أنشئ في {{ $user->created_at->format('Y-m-d') }}
+                            </small>
                         </div>
+
                     </div>
                 </div>
             </div>

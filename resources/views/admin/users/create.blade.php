@@ -10,75 +10,98 @@
                     </div>
                     <div class="card-body">
                         <p class="card-text text-muted mb-4">املأ البيانات التالية</p>
+
                         <form action="{{ route('admin.users.store') }}" method="POST">
                             @csrf
+
+                            {{-- الاسم + الايميل --}}
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="name" class="form-label">الاسم *</label>
-                                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
-                                        @error('name')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    <label class="form-label">الاسم *</label>
+                                    <input type="text" name="name" class="form-control" required
+                                        value="{{ old('name') }}">
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">البريد الإلكتروني *</label>
-                                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
-                                        @error('email')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    <label class="form-label">البريد الإلكتروني *</label>
+                                    <input type="email" name="email" class="form-control" required
+                                        value="{{ old('email') }}">
                                 </div>
                             </div>
+
+                            {{-- كلمة المرور --}}
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">كلمة المرور *</label>
+                                    <input type="password" name="password" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">تأكيد كلمة المرور *</label>
+                                    <input type="password" name="password_confirmation" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <hr class="border-secondary my-4">
+
+                            {{-- البيانات الإضافية --}}
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="password" class="form-label">كلمة المرور *</label>
-                                        <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
-                                        @error('password')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    <label>📞 رقم الهاتف</label>
+                                    <input type="text" name="phone" class="form-control" value="{{ old('phone') }}">
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="password_confirmation" class="form-label">تأكيد كلمة المرور *</label>
-                                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                                    </div>
+                                    <label>✈️ معرف التلكرام</label>
+                                    <input type="text" name="telegram_id" class="form-control"
+                                        value="{{ old('telegram_id') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>🎂 تاريخ الميلاد</label>
+                                    <input type="date" name="birth_date" class="form-control"
+                                        value="{{ old('birth_date') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>🚻 الجنس</label>
+                                    <select name="gender" class="form-control">
+                                        <option value="">— اختر —</option>
+                                        <option value="male">ذكر</option>
+                                        <option value="female">أنثى</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>🆔 الرقم الوطني</label>
+                                    <input type="text" name="national_id" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>📍 العنوان</label>
+                                    <input type="text" name="address" class="form-control">
+                                </div>
+                                <div class="col-12">
+                                    <label>📝 ملاحظات</label>
+                                    <textarea name="notes" rows="3" class="form-control"></textarea>
                                 </div>
                             </div>
+
+                            <hr class="border-secondary my-4">
+
+                            {{-- الدور --}}
                             <div class="mb-3">
-                                <label for="role_id" class="form-label">الدور</label>
-                                <select class="form-control @error('role_id') is-invalid @enderror" id="role_id" name="role_id">
-                                    <option value="">لا تعيين دور</option>
+                                <label>الدور</label>
+                                <select name="role_id" class="form-control">
+                                    <option value="">لا تعيين</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                            {{ $role->display_name ?? $role->name }}
-                                        </option>
+                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
                                     @endforeach
                                 </select>
-                                @error('role_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
+
                             <div class="d-flex justify-content-between">
-                                <button type="submit" class="btn btn-primary">إضافة المستخدم</button>
+                                <button class="btn btn-primary">إضافة</button>
                                 <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">إلغاء</a>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- CSS مخصص لحل مشكلة لون النص في القائمة المنسدلة -->
-    <style>
-        .card-body select.form-control option {
-            color: #212529 !important;
-            background-color: white !important;
-        }
-    </style>
 @endsection
