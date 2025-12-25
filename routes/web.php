@@ -136,7 +136,7 @@ Route::prefix('admin')
             ->name('admin.dashboard');
 
     Route::get('attendance/day/{date}', [AttendanceController::class, 'day'])
-        ->name('attendance.day');
+        ->name('admin.attendance.day');
 
 
 
