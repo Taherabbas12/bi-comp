@@ -69,6 +69,42 @@ class AttendanceAdminController extends Controller
 
         return view('admin.attendance.day', compact('day', 'records', 'userId'));
     }
+
+    public function userMonthly(Request $request)
+    {
+        $userId = $request->get('user_id');
+        abort_if(! $userId, 404);
+
+        $month = $request->get('month', now()->format('Y-m'));
+
+        // Period from day 6 to day 5
+        $start = Carbon::createFromFormat('Y-m', $month)
+            ->day(6)
+            ->startOfDay();
+
+        $end = $start->copy()
+            ->addMonth()
+            ->day(5)
+            ->endOfDay();
+
+        $user = User::findOrFail($userId);
+
+        $records = Attendance::where('user_id', $userId)
+            ->whereBetween('work_date', [$start, $end])
+            ->orderBy('work_date')
+            ->get();
+
+        $totalMinutes = $records->sum(fn ($r) => $r->session_minutes);
+
+        return view('admin.attendance.user-monthly', compact(
+            'user',
+            'records',
+            'month',
+            'start',
+            'end',
+            'totalMinutes'
+        ));
+    }
     // الصفحة الرئيسية لإدارة الحضور
     // public function index(Request $request)
     // {
