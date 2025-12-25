@@ -32,6 +32,17 @@ class AttendanceAdminController extends Controller
             'usersCount' => $usersCount,
         ]);
     }
+    public function day(string $date)
+    {
+        $day = Carbon::parse($date);
+
+        $records = Attendance::with('user')
+            ->whereDate('work_date', $day)
+            ->orderBy('check_in_at')
+            ->get();
+
+        return view('admin.attendance.day', compact('day', 'records'));
+    }
     // الصفحة الرئيسية لإدارة الحضور
     // public function index(Request $request)
     // {
