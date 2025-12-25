@@ -14,8 +14,17 @@ class AttendanceAdminController extends Controller
     public function index(Request $request)
     {
         $month = $request->get('month', now()->format('Y-m'));
-        $start = Carbon::parse($month)->startOfMonth();
-        $end   = Carbon::parse($month)->endOfMonth();
+
+        // 🟢 بداية الفترة: يوم 6 من الشهر
+        $start = Carbon::createFromFormat('Y-m', $month)
+            ->day(6)
+            ->startOfDay();
+
+        // 🟢 نهاية الفترة: يوم 5 من الشهر التالي
+        $end = $start->copy()
+            ->addMonth()
+            ->day(5)
+            ->endOfDay();
 
         $usersCount = User::count();
 
