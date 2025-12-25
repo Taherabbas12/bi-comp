@@ -13,44 +13,61 @@ class AttendanceAdminController extends Controller
     // الصفحة الرئيسية لإدارة الحضور
     public function index(Request $request)
     {
-        $month = $request->get('month', now()->format('Y-m'));
+        $month  = $request->get('month', now()->format('Y-m'));
+        $userId = $request->get('user_id'); // 👈 الموظف المختار
 
-        // 🟢 بداية الفترة: يوم 6 من الشهر
+        // 🟢 بداية الفترة: 6
         $start = Carbon::createFromFormat('Y-m', $month)
             ->day(6)
             ->startOfDay();
 
-        // 🟢 نهاية الفترة: يوم 5 من الشهر التالي
+        // 🟢 نهاية الفترة: 5
         $end = $start->copy()
             ->addMonth()
             ->day(5)
             ->endOfDay();
 
-        $usersCount = User::count();
+        $users = User::orderBy('name')->get();
 
-        $attendanceByDay = Attendance::whereBetween('work_date', [$start, $end])
+        $query = Attendance::whereBetween('work_date', [$start, $end]);
+
+        // ✅ فلترة حسب الموظف إن وجد
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        $attendanceByDay = $query
             ->selectRaw('work_date, COUNT(DISTINCT user_id) as present_count')
             ->groupBy('work_date')
             ->pluck('present_count', 'work_date');
 
-        return view('admin.attendance.index', [
-            'month' => $month,
-            'start' => $start,
-            'end'   => $end,
-            'attendanceByDay' => $attendanceByDay,
-            'usersCount' => $usersCount,
-        ]);
+        $usersCount = $userId ? 1 : User::count();
+
+        return view('admin.attendance.index', compact(
+            'month',
+            'start',
+            'end',
+            'attendanceByDay',
+            'usersCount',
+            'users',
+            'userId'
+        ));
     }
-    public function day(string $date)
+    public function day(string $date, Request $request)
     {
-        $day = Carbon::parse($date);
+        $day    = Carbon::parse($date);
+        $userId = $request->get('user_id');
 
-        $records = Attendance::with('user')
-            ->whereDate('work_date', $day)
-            ->orderBy('check_in_at')
-            ->get();
+        $query = Attendance::with('user')
+            ->whereDate('work_date', $day);
 
-        return view('admin.attendance.day', compact('day', 'records'));
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        $records = $query->orderBy('check_in_at')->get();
+
+        return view('admin.attendance.day', compact('day', 'records', 'userId'));
     }
     // الصفحة الرئيسية لإدارة الحضور
     // public function index(Request $request)
