@@ -13,28 +13,50 @@ class AttendanceAdminController extends Controller
     // الصفحة الرئيسية لإدارة الحضور
     public function index(Request $request)
     {
-        $users = User::orderBy('name')->get();
+        $month = $request->get('month', now()->format('Y-m'));
+        $start = Carbon::parse($month)->startOfMonth();
+        $end   = Carbon::parse($month)->endOfMonth();
 
-        $query = Attendance::with('user')->orderBy('work_date', 'desc');
+        $usersCount = User::count();
 
-        // فلترة الموظف
-        if ($request->user_id) {
-            $query->where('user_id', $request->user_id);
-        }
+        $attendanceByDay = Attendance::whereBetween('work_date', [$start, $end])
+            ->selectRaw('work_date, COUNT(DISTINCT user_id) as present_count')
+            ->groupBy('work_date')
+            ->pluck('present_count', 'work_date');
 
-        // فلترة التاريخ
-        if ($request->from_date) {
-            $query->whereDate('work_date', '>=', $request->from_date);
-        }
-
-        if ($request->to_date) {
-            $query->whereDate('work_date', '<=', $request->to_date);
-        }
-
-        $records = $query->paginate(20);
-
-        return view('admin.attendance.index', compact('records', 'users'));
+        return view('admin.attendance.index', [
+            'month' => $month,
+            'start' => $start,
+            'end'   => $end,
+            'attendanceByDay' => $attendanceByDay,
+            'usersCount' => $usersCount,
+        ]);
     }
+    // الصفحة الرئيسية لإدارة الحضور
+    // public function index(Request $request)
+    // {
+    //     $users = User::orderBy('name')->get();
+
+    //     $query = Attendance::with('user')->orderBy('work_date', 'desc');
+
+    //     // فلترة الموظف
+    //     if ($request->user_id) {
+    //         $query->where('user_id', $request->user_id);
+    //     }
+
+    //     // فلترة التاريخ
+    //     if ($request->from_date) {
+    //         $query->whereDate('work_date', '>=', $request->from_date);
+    //     }
+
+    //     if ($request->to_date) {
+    //         $query->whereDate('work_date', '<=', $request->to_date);
+    //     }
+
+    //     $records = $query->paginate(20);
+
+    //     return view('admin.attendance.index', compact('records', 'users'));
+    // }
 
 
 
