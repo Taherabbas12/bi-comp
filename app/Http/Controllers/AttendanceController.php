@@ -81,9 +81,6 @@ class AttendanceController extends Controller
             'status' => true,
             'message' => '✅ تم تسجيل الحضور بنجاح - الساعة: ' . $now->format('H:i:s') . ' - المسافة: ' . $distance . ' متر'
         ]);
-            'status' => true,
-            'message' => '✅ تم تسجيل الحضور بنجاح - الوقت: ' . $now->format('H:i:s')
-        ]);
     }
 
     /* ===================== CHECK OUT ===================== */
