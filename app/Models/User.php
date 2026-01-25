@@ -39,6 +39,14 @@ class User extends Authenticatable
         'gender',
         'national_id',
         'notes',
+
+        // 💼 بيانات التوظيف
+        'salary',
+        'salary_currency',
+        'employment_type',
+        'department',
+        'position',
+        'hire_date',
     ];
 
     /**
@@ -59,6 +67,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'birth_date' => 'date',
+        'hire_date' => 'date',
+        'salary' => 'decimal:2',
         'password' => 'hashed',
     ];
 
@@ -80,11 +90,17 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id'); // <-- تأكد من وجود role_id في جدول users
     }
 
-    // علاقة: المستخدم يملك العديد من الأدوار (Many-to-Many) <-- إذا كنت بحاجة إليها لاحقًا
-    // public function roles()
-    // {
-    //     return $this->belongsToMany(Role::class, 'user_roles'); // <-- افترض وجود جدول وصلي user_roles
-    // }
+    // علاقة: الموظف يملك جدول عمل واحد أو أكثر
+    public function workSchedules()
+    {
+        return $this->hasMany(WorkSchedule::class);
+    }
+
+    // علاقة: الموظف يملك سجلات حضور
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 
     // دالة للتحقق من صلاحية المستخدم (Will be used in middleware/policies)
     public function hasPermission($permissionName)

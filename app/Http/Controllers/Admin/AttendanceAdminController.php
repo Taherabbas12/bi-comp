@@ -43,41 +43,77 @@ class AttendanceAdminController extends Controller
 
         $usersCount = $userId ? 1 : User::count();
 
-        // حساب إحصائيات الأسابيع للموظف المختار
+        // حساب إحصائيات الأسابيع والموظف المختار
         $weeklyStats = [];
+        $userInfo = null;
+        $attendanceSummary = [];
+
         if ($userId) {
+            $userInfo = User::findOrFail($userId);
+
+            // حساب إحصائيات الحضور الشاملة
+            $records = Attendance::where('user_id', $userId)
+                ->whereBetween('work_date', [$start, $end])
+                ->orderBy('work_date')
+                ->get();
+
+            $totalMinutes = $records->sum(fn($r) => $r->session_minutes);
+            $totalHours = intdiv($totalMinutes, 60);
+            $remainingMinutes = $totalMinutes % 60;
+            $daysPresent = $records->count();
+
+            // حساب عدد أيام العمل الرسمية
+            $totalWorkDays = $this->calculateWorkingDays($start, $end, $userId);
+            $daysAbsent = max(0, $totalWorkDays - $daysPresent);
+
+            $attendanceSummary = [
+                'days_present' => $daysPresent,
+                'days_absent' => $daysAbsent,
+                'total_work_days' => $totalWorkDays,
+                'total_hours' => $totalHours,
+                'total_minutes' => $remainingMinutes,
+                'salary' => $userInfo->salary,
+                'salary_currency' => $userInfo->salary_currency ?? 'IQD',
+                'employment_type' => $userInfo->employment_type,
+                'department' => $userInfo->department,
+                'position' => $userInfo->position,
+            ];
+
+            // حساب إحصائيات الأسابيع
             $currentDate = $start->copy();
             $weekNumber = 1;
-            
+
             while ($currentDate <= $end) {
                 $weekStart = $currentDate->copy()->startOfWeek();
                 $weekEnd = $currentDate->copy()->endOfWeek();
-                
-                // تأكد من أن الأسبوع ضمن نطاق الشهر
+
                 if ($weekStart > $end) break;
                 if ($weekEnd < $start) {
                     $currentDate->addWeek();
                     $weekNumber++;
                     continue;
                 }
-                
+
                 $weekRecords = Attendance::where('user_id', $userId)
                     ->whereBetween('work_date', [$weekStart, $weekEnd])
                     ->get();
-                
+
                 $weekMinutes = $weekRecords->sum(fn($r) => $r->session_minutes);
                 $weekDays = $weekRecords->count();
-                
+                $weekWorkDays = $this->calculateWorkingDays($weekStart, $weekEnd, $userId);
+
                 $weeklyStats[] = [
                     'week_number' => $weekNumber,
                     'start' => $weekStart->format('Y-m-d'),
                     'end' => $weekEnd->format('Y-m-d'),
-                    'days' => $weekDays,
+                    'days_present' => $weekDays,
+                    'days_absent' => max(0, $weekWorkDays - $weekDays),
+                    'total_work_days' => $weekWorkDays,
                     'minutes' => $weekMinutes,
                     'hours' => intdiv($weekMinutes, 60),
                     'remaining_minutes' => $weekMinutes % 60,
                 ];
-                
+
                 $currentDate->addWeek();
                 $weekNumber++;
             }
@@ -91,8 +127,11 @@ class AttendanceAdminController extends Controller
             'usersCount',
             'users',
             'userId',
-            'weeklyStats'
+            'weeklyStats',
+            'userInfo',
+            'attendanceSummary'
         ));
+
     }
     public function day(string $date, Request $request)
     {
@@ -206,4 +245,33 @@ class AttendanceAdminController extends Controller
 
         return back()->with('success', 'تم تحديث سجل الحضور بنجاح');
     }
+
+    // دالة مساعدة لحساب أيام العمل بين تاريخين
+    private function calculateWorkingDays(Carbon $start, Carbon $end, $userId)
+    {
+        $workDays = 0;
+        $currentDate = $start->copy();
+
+        while ($currentDate <= $end) {
+            $dayOfWeek = $currentDate->dayOfWeek; // 0 = Sunday, 1 = Monday, etc
+
+            // تحويل إلى صيغة الجدول (1-7 بدلاً من 0-6)
+            $dayOfWeekDb = $dayOfWeek === 0 ? 7 : $dayOfWeek;
+
+            // البحث عن جدول العمل للموظف في هذا اليوم
+            $schedule = \App\Models\WorkSchedule::where('user_id', $userId)
+                ->where('day_of_week', $dayOfWeekDb)
+                ->first();
+
+            // إذا لم يكن هناك جدول محدد أو اليوم ليس عطلة، عدّه يوم عمل
+            if (!$schedule || !$schedule->is_day_off) {
+                $workDays++;
+            }
+
+            $currentDate->addDay();
+        }
+
+        return $workDays;
+    }
 }
+

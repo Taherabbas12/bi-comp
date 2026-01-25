@@ -221,22 +221,80 @@
             <!-- Report Card -->
             <div class="stats-grid">
                 <div class="report-card">
-                    <div class="report-stat">{{ $daysPresent }}</div>
+                    <div class="report-stat">{{ $attendanceSummary['days_present'] ?? 0 }}</div>
                     <div class="report-label">أيام الحضور</div>
+                </div>
+                <div class="report-card"
+                    style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(249, 115, 115, 0.1) 100%);">
+                    <div class="report-stat" style="color: #ef4444;">{{ $attendanceSummary['days_absent'] ?? 0 }}</div>
+                    <div class="report-label">أيام الغياب</div>
                 </div>
                 <div class="report-card">
                     <div class="report-stat">
-                        @if ($totalHours > 0 && $remainingMinutes > 0)
-                            {{ $totalHours }}h {{ $remainingMinutes }}m
-                        @elseif ($totalHours > 0)
-                            {{ $totalHours }}h
+                        @if (($attendanceSummary['total_hours'] ?? 0) > 0 && ($attendanceSummary['total_minutes'] ?? 0) > 0)
+                            {{ $attendanceSummary['total_hours'] }}h<br><small>{{ $attendanceSummary['total_minutes'] }}m</small>
+                        @elseif (($attendanceSummary['total_hours'] ?? 0) > 0)
+                            {{ $attendanceSummary['total_hours'] }}h
                         @else
-                            {{ $remainingMinutes }}m
+                            {{ $attendanceSummary['total_minutes'] ?? 0 }}m
                         @endif
                     </div>
                     <div class="report-label">إجمالي ساعات الحضور</div>
                 </div>
             </div>
+
+            <!-- Employee Info & Salary -->
+            @if (!empty($attendanceSummary))
+                <div class="card bg-dark text-light border-light mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">💼 بيانات الموظف والراتب</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">المسمى الوظيفي</label>
+                                <div class="h6">{{ $attendanceSummary['position'] ?? '—' }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">القسم/الإدارة</label>
+                                <div class="h6">{{ $attendanceSummary['department'] ?? '—' }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">نوع التوظيف</label>
+                                <div class="h6">
+                                    @switch($attendanceSummary['employment_type'] ?? null)
+                                        @case('full-time')
+                                            <span class="badge bg-success">دوام كامل</span>
+                                        @break
+
+                                        @case('part-time')
+                                            <span class="badge bg-info">دوام جزئي</span>
+                                        @break
+
+                                        @case('contract')
+                                            <span class="badge bg-warning">عقد</span>
+                                        @break
+
+                                        @case('temporary')
+                                            <span class="badge bg-secondary">مؤقت</span>
+                                        @break
+
+                                        @default
+                                            —
+                                    @endswitch
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">الراتب الشهري</label>
+                                <div class="h6 text-success fw-bold">
+                                    {{ $attendanceSummary['salary'] ? number_format($attendanceSummary['salary'], 2) : '—' }}
+                                    {{ $attendanceSummary['salary_currency'] ?? 'IQD' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Weekly Statistics -->
             @if (!empty($weeklyStats))
@@ -249,7 +307,7 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h6 class="card-title mb-0">الأسبوع {{ $week['week_number'] }}</h6>
-                                            @if ($week['days'] > 0)
+                                            @if ($week['days_present'] > 0)
                                                 <span class="badge bg-success">✔ حاضر</span>
                                             @else
                                                 <span class="badge bg-danger">❌ غائب</span>
@@ -259,17 +317,23 @@
                                             {{ $week['start'] }} إلى {{ $week['end'] }}
                                         </div>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <div class="text-center">
-                                                    <div class="h5 text-success mb-1">{{ $week['days'] }}</div>
-                                                    <div class="small">أيام الحضور</div>
+                                                    <div class="h6 text-success mb-1">{{ $week['days_present'] }}</div>
+                                                    <div class="small text-muted">حضور</div>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <div class="text-center">
-                                                    <div class="h5 text-info mb-1">
+                                                    <div class="h6 text-danger mb-1">{{ $week['days_absent'] }}</div>
+                                                    <div class="small text-muted">غياب</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-center">
+                                                    <div class="h6 text-info mb-1">
                                                         @if ($week['hours'] > 0 && $week['remaining_minutes'] > 0)
-                                                            {{ $week['hours'] }}h<br><small>{{ $week['remaining_minutes'] }}m</small>
+                                                            {{ $week['hours'] }}h
                                                         @elseif ($week['hours'] > 0)
                                                             {{ $week['hours'] }}h
                                                         @else
@@ -288,16 +352,123 @@
                 </div>
             @endif
 
+            <!-- Official Work Times -->
+            @if ($userInfo)
+                <div class="card bg-dark text-light border-light mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">🕐 أوقات العمل الرسمية</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead style="background: rgba(51, 65, 85, 0.3);">
+                                <tr>
+                                    <th>اليوم</th>
+                                    <th>وقت الدخول الرسمي</th>
+                                    <th>وقت الخروج الرسمي</th>
+                                    <th>ساعات العمل</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $schedules = $userInfo->workSchedules->sortBy('day_of_week');
+                                    if ($schedules->isEmpty()) {
+                                        // إنشاء جدول افتراضي
+                                        $schedules = collect([
+                                            (object) [
+                                                'day_of_week' => 1,
+                                                'official_check_in' => '08:00',
+                                                'official_check_out' => '17:00',
+                                                'working_hours' => 8,
+                                                'is_day_off' => false,
+                                                'day_name' => 'الاثنين',
+                                            ],
+                                            (object) [
+                                                'day_of_week' => 2,
+                                                'official_check_in' => '08:00',
+                                                'official_check_out' => '17:00',
+                                                'working_hours' => 8,
+                                                'is_day_off' => false,
+                                                'day_name' => 'الثلاثاء',
+                                            ],
+                                            (object) [
+                                                'day_of_week' => 3,
+                                                'official_check_in' => '08:00',
+                                                'official_check_out' => '17:00',
+                                                'working_hours' => 8,
+                                                'is_day_off' => false,
+                                                'day_name' => 'الأربعاء',
+                                            ],
+                                            (object) [
+                                                'day_of_week' => 4,
+                                                'official_check_in' => '08:00',
+                                                'official_check_out' => '17:00',
+                                                'working_hours' => 8,
+                                                'is_day_off' => false,
+                                                'day_name' => 'الخميس',
+                                            ],
+                                            (object) [
+                                                'day_of_week' => 5,
+                                                'official_check_in' => '08:00',
+                                                'official_check_out' => '17:00',
+                                                'working_hours' => 8,
+                                                'is_day_off' => false,
+                                                'day_name' => 'الجمعة',
+                                            ],
+                                            (object) [
+                                                'day_of_week' => 6,
+                                                'official_check_in' => null,
+                                                'official_check_out' => null,
+                                                'working_hours' => 0,
+                                                'is_day_off' => true,
+                                                'day_name' => 'السبت',
+                                            ],
+                                            (object) [
+                                                'day_of_week' => 7,
+                                                'official_check_in' => null,
+                                                'official_check_out' => null,
+                                                'working_hours' => 0,
+                                                'is_day_off' => true,
+                                                'day_name' => 'الأحد',
+                                            ],
+                                        ]);
+                                    }
+                                @endphp
+
+                                @foreach ($schedules as $schedule)
+                                    <tr>
+                                        <td><strong>{{ $schedule->day_name ?? 'يوم' }}</strong></td>
+                                        <td>{{ $schedule->official_check_in ? \Carbon\Carbon::parse($schedule->official_check_in)->format('H:i') : '—' }}
+                                        </td>
+                                        <td>{{ $schedule->official_check_out ? \Carbon\Carbon::parse($schedule->official_check_out)->format('H:i') : '—' }}
+                                        </td>
+                                        <td>{{ $schedule->working_hours > 0 ? $schedule->working_hours . 'h' : '—' }}</td>
+                                        <td>
+                                            @if ($schedule->is_day_off)
+                                                <span class="badge bg-secondary">عطلة</span>
+                                            @else
+                                                <span class="badge bg-success">دوام</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
             <div class="card bg-dark text-light border-light mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>👤 {{ $user?->name }}</strong>
+                    <strong>👤 {{ $user?->name ?? $userInfo?->name }}</strong>
                     <span>
-                        @if ($totalHours > 0 && $remainingMinutes > 0)
-                            ⏱️ المجموع: {{ $totalHours }}h {{ $remainingMinutes }}m
-                        @elseif ($totalHours > 0)
-                            ⏱️ المجموع: {{ $totalHours }}h
+                        @if (($attendanceSummary['total_hours'] ?? 0) > 0 && ($attendanceSummary['total_minutes'] ?? 0) > 0)
+                            ⏱️ المجموع: {{ $attendanceSummary['total_hours'] }}h
+                            {{ $attendanceSummary['total_minutes'] }}m
+                        @elseif (($attendanceSummary['total_hours'] ?? 0) > 0)
+                            ⏱️ المجموع: {{ $attendanceSummary['total_hours'] }}h
                         @else
-                            ⏱️ المجموع: {{ $remainingMinutes }}m
+                            ⏱️ المجموع: {{ $attendanceSummary['total_minutes'] ?? 0 }}m
                         @endif
                     </span>
                 </div>
