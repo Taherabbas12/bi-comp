@@ -69,6 +69,7 @@ class User extends Authenticatable
         'birth_date' => 'date',
         'hire_date' => 'date',
         'salary' => 'decimal:2',
+        'is_inside_office' => 'boolean',
         'password' => 'hashed',
     ];
 

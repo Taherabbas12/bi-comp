@@ -252,6 +252,10 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label class="text-muted small">الاسم</label>
+                                <div class="h6">{{ $userInfo?->name ?? '—' }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="text-muted small">المسمى الوظيفي</label>
                                 <div class="h6">{{ $attendanceSummary['position'] ?? '—' }}</div>
                             </div>
@@ -287,12 +291,32 @@
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small">الراتب الشهري</label>
                                 <div class="h6 text-success fw-bold">
-                                    {{ $attendanceSummary['salary'] ? number_format($attendanceSummary['salary'], 2) : '—' }}
-                                    {{ $attendanceSummary['salary_currency'] ?? 'IQD' }}
+                                    @if($attendanceSummary['salary'])
+                                        {{ number_format($attendanceSummary['salary'], 2) }}
+                                        {{ $attendanceSummary['salary_currency'] ?? 'IQD' }}
+                                    @else
+                                        —
+                                    @endif
                                 </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">تاريخ التعيين</label>
+                                <div class="h6">{{ $userInfo?->hire_date?->format('Y-m-d') ?? '—' }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">أجمالي أيام العمل</label>
+                                <div class="h6 text-info">{{ $attendanceSummary['total_work_days'] ?? 0 }} أيام</div>
                             </div>
                         </div>
                     </div>
+                </div>
+            @elseif($userId)
+                <!-- Warning: No attendance data -->
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading">⚠️ تنبيه</h4>
+                    <p>لم يتم العثور على بيانات حضور للموظف المختار في هذه الفترة.</p>
+                    <hr>
+                    <p class="mb-0">تأكد من أن الموظف لديه سجلات حضور أو قم بإضافة سجلات حضور جديدة.</p>
                 </div>
             @endif
 
