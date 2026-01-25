@@ -94,10 +94,15 @@
                         </div>
 
                         <!-- Footer -->
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
-                                ← رجوع
-                            </a>
+                        <div class="d-flex justify-content-between align-items-center mt-4 gap-2">
+                            <div>
+                                <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
+                                    ← رجوع
+                                </a>
+                                <a href="{{ route('work-schedules.edit', $user) }}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-clock"></i> أوقات العمل
+                                </a>
+                            </div>
                             <small class="text-muted">
                                 {{ $user->created_at->format('Y-m-d') }}
                             </small>

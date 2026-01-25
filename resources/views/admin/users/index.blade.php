@@ -104,22 +104,32 @@
                             @endif
 
                             <!-- Actions -->
-                            <div class="mt-auto pt-3 d-grid grid-actions">
-                                <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-info">
+                            <div class="mt-auto pt-3 d-flex gap-2">
+                                <a href="{{ route('admin.users.show', $user) }}"
+                                    class="btn btn-sm btn-outline-info flex-grow-1" title="عرض">
                                     <i class="bi bi-eye"></i>
                                 </a>
 
-                                <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ route('admin.users.edit', $user) }}"
+                                    class="btn btn-sm btn-outline-primary flex-grow-1" title="تعديل">
                                     <i class="bi bi-pencil"></i>
                                 </a>
 
-                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST">
+                                <a href="{{ route('work-schedules.edit', $user) }}"
+                                    class="btn btn-sm btn-outline-warning flex-grow-1" title="أوقات العمل">
+                                    <i class="bi bi-clock"></i>
+                                </a>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="if(confirm('هل أنت متأكد من الحذف؟')) { document.getElementById('delete-form-{{ $user->id }}').submit(); }"
+                                    title="حذف">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <form id="delete-form-{{ $user->id }}"
+                                    action="{{ route('admin.users.destroy', $user) }}" method="POST"
+                                    style="display:none;">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('هل أنت متأكد من الحذف؟')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
                                 </form>
                             </div>
 
@@ -143,14 +153,20 @@
 
     <!-- Mobile Fix -->
     <style>
-        .grid-actions {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+        .btn-outline-warning {
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
         }
 
         @media (max-width: 576px) {
-            .grid-actions .btn {
-                padding: 6px 0;
+            .btn {
+                padding: 0.4rem 0.5rem;
                 font-size: 0.75rem;
             }
 

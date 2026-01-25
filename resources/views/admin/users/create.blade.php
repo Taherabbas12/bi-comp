@@ -87,7 +87,7 @@
                                 <div class="col-12">
                                     <h6 class="text-info">💼 بيانات التوظيف والراتب</h6>
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <label>💰 الراتب</label>
                                     <input type="number" name="salary" class="form-control" step="0.01"
@@ -110,18 +110,24 @@
 
                                 <div class="col-md-6">
                                     <label>🎯 المسمى الوظيفي</label>
-                                    <input type="text" name="position" class="form-control"
-                                        value="{{ old('position') }}" placeholder="مثال: مهندس برمجيات">
+                                    <input type="text" name="position" class="form-control" value="{{ old('position') }}"
+                                        placeholder="مثال: مهندس برمجيات">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label>📋 نوع التوظيف</label>
                                     <select name="employment_type" class="form-control">
                                         <option value="">— اختر —</option>
-                                        <option value="full-time" {{ old('employment_type') == 'full-time' ? 'selected' : '' }}>دوام كامل</option>
-                                        <option value="part-time" {{ old('employment_type') == 'part-time' ? 'selected' : '' }}>دوام جزئي</option>
-                                        <option value="contract" {{ old('employment_type') == 'contract' ? 'selected' : '' }}>عقد</option>
-                                        <option value="temporary" {{ old('employment_type') == 'temporary' ? 'selected' : '' }}>مؤقت</option>
+                                        <option value="full-time"
+                                            {{ old('employment_type') == 'full-time' ? 'selected' : '' }}>دوام كامل
+                                        </option>
+                                        <option value="part-time"
+                                            {{ old('employment_type') == 'part-time' ? 'selected' : '' }}>دوام جزئي
+                                        </option>
+                                        <option value="contract"
+                                            {{ old('employment_type') == 'contract' ? 'selected' : '' }}>عقد</option>
+                                        <option value="temporary"
+                                            {{ old('employment_type') == 'temporary' ? 'selected' : '' }}>مؤقت</option>
                                     </select>
                                 </div>
 
@@ -140,7 +146,9 @@
                                 <select name="role_id" class="form-control">
                                     <option value="">لا تعيين</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                                        <option value="{{ $role->id }}"
+                                            {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>

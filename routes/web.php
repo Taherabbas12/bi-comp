@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\TaskController as AdminTaskController;
 use App\Http\Controllers\Admin\TaskStatusController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\WorkScheduleController;
 use App\Http\Controllers\Customer\LaptopController as CustomerLaptopController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Employee\EmployeeDashboardController;
@@ -234,6 +235,20 @@ Route::prefix('admin')
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])
             ->name('admin.users.destroy')
             ->middleware('permission:delete_users');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Work Schedules (Admin)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/work-schedules/{user}/edit', [WorkScheduleController::class, 'edit'])
+            ->name('work-schedules.edit')
+            ->middleware('permission:edit_users');
+
+        Route::put('/work-schedules/{user}', [WorkScheduleController::class, 'update'])
+            ->name('work-schedules.update')
+            ->middleware('permission:edit_users');
 
         /*
         |--------------------------------------------------------------------------
