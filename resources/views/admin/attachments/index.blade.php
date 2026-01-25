@@ -38,10 +38,10 @@
                                 <!-- Attachment Type -->
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">📋 نوع المرفق</label>
-                                    <select name="attachment_type" class="form-control" required>
-                                        <option value="">-- اختر --</option>
+                                    <select name="attachment_type" class="form-control bg-dark text-light border-secondary" required>
+                                        <option value="" class="bg-dark text-light">-- اختر --</option>
                                         @foreach ($attachmentTypes as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
+                                            <option value="{{ $key }}" class="bg-dark text-light">{{ $label }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -203,6 +203,25 @@
             background-color: #ffc107;
             border-color: #ffc107;
             color: #000;
+        }
+
+        /* Style for select dropdown */
+        select.form-control {
+            background-color: #212529;
+            color: #fff;
+            border-color: #495057;
+        }
+
+        select.form-control:focus {
+            background-color: #212529;
+            color: #fff;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        select.form-control option {
+            background-color: #212529;
+            color: #fff;
         }
     </style>
 @endsection
