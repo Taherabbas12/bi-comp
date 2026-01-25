@@ -57,7 +57,7 @@ class UserWorkSchedule extends Model
 
         $checkIn = \Carbon\Carbon::createFromFormat('H:i:s', $this->check_in);
         $checkOut = \Carbon\Carbon::createFromFormat('H:i:s', $this->check_out);
-        
+
         return $checkOut->diffInHours($checkIn);
     }
 }

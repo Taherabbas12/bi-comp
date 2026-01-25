@@ -99,7 +99,8 @@
                                 <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
                                     ← رجوع
                                 </a>
-                                <a href="{{ route('user-work-schedules.edit', $user) }}" class="btn btn-sm btn-outline-info">
+                                <a href="{{ route('user-work-schedules.edit', $user) }}"
+                                    class="btn btn-sm btn-outline-info">
                                     <i class="bi bi-calendar-week"></i> جدول العمل
                                 </a>
                                 <a href="{{ route('admin.attachments.index', $user) }}"

@@ -45,9 +45,12 @@
                                                         id="day_off_{{ $schedule->day_of_week }}"
                                                         @checked($schedule->is_day_off)
                                                         data-day="{{ $schedule->day_of_week }}">
-                                                    <label class="form-check-label" for="day_off_{{ $schedule->day_of_week }}">
+                                                    <label class="form-check-label"
+                                                        for="day_off_{{ $schedule->day_of_week }}">
                                                         <strong>{{ $schedule->day_name }}</strong>
-                                                        <span class="badge bg-danger ms-2" style="display: {{ $schedule->is_day_off ? 'inline-block' : 'none' }}" id="badge_{{ $schedule->day_of_week }}">عطلة</span>
+                                                        <span class="badge bg-danger ms-2"
+                                                            style="display: {{ $schedule->is_day_off ? 'inline-block' : 'none' }}"
+                                                            id="badge_{{ $schedule->day_of_week }}">عطلة</span>
                                                     </label>
                                                 </div>
                                             </div>
@@ -60,13 +63,15 @@
                                                 <div class="row g-2">
                                                     <div class="col-12 col-md-6">
                                                         <label class="form-label">🕐 وقت الدخول</label>
-                                                        <input type="time" name="schedules[{{ $index }}][check_in]"
+                                                        <input type="time"
+                                                            name="schedules[{{ $index }}][check_in]"
                                                             class="form-control"
                                                             value="{{ $schedule->check_in ? $schedule->check_in : '09:00' }}">
                                                     </div>
                                                     <div class="col-12 col-md-6">
                                                         <label class="form-label">🕓 وقت الخروج</label>
-                                                        <input type="time" name="schedules[{{ $index }}][check_out]"
+                                                        <input type="time"
+                                                            name="schedules[{{ $index }}][check_out]"
                                                             class="form-control"
                                                             value="{{ $schedule->check_out ? $schedule->check_out : '17:00' }}">
                                                     </div>
@@ -109,7 +114,7 @@
                 const day = this.dataset.day;
                 const scheduleInputs = document.getElementById('schedule_' + day);
                 const badge = document.getElementById('badge_' + day);
-                
+
                 if (this.checked) {
                     scheduleInputs.style.display = 'none';
                     badge.style.display = 'inline-block';
