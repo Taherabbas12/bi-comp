@@ -693,9 +693,13 @@
                 <div class="top-bar-info">
                     <!-- يمكنك إضافة معلومات إضافية هنا -->
                 </div>
-                <a href="{{ route('logout') }}" class="btn btn-danger logout-btn d-none d-md-inline-block">
+                <a href="{{ route('logout') }}" class="btn btn-danger logout-btn d-none d-md-inline-block"
+                    onclick="event.preventDefault(); document.getElementById('logout-form-top').submit();">
                     <i class="bi bi-box-arrow-right"></i> تسجيل الخروج
                 </a>
+                <form id="logout-form-top" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
             </div>
 
             <div class="content">
