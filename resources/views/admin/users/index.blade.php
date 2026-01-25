@@ -105,20 +105,27 @@
 
                             <!-- Actions -->
                             <div class="mt-auto pt-3 d-flex gap-2">
-                                <a href="{{ route('admin.users.show', $user) }}"
-                                    class="btn btn-sm btn-outline-info flex-grow-1" title="عرض">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{{ route('admin.users.show', $user) }}"
+                                        class="btn btn-sm btn-outline-info" title="عرض">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
 
-                                <a href="{{ route('admin.users.edit', $user) }}"
-                                    class="btn btn-sm btn-outline-primary flex-grow-1" title="تعديل">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
+                                    <a href="{{ route('admin.users.edit', $user) }}"
+                                        class="btn btn-sm btn-outline-primary" title="تعديل">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
 
-                                <a href="{{ route('work-schedules.edit', $user) }}"
-                                    class="btn btn-sm btn-outline-warning flex-grow-1" title="أوقات العمل">
-                                    <i class="bi bi-clock"></i>
-                                </a>
+                                    <a href="{{ route('work-schedules.edit', $user) }}"
+                                        class="btn btn-sm btn-outline-warning" title="أوقات العمل">
+                                        <i class="bi bi-clock"></i>
+                                    </a>
+
+                                    <a href="{{ route('admin.attachments.index', $user) }}"
+                                        class="btn btn-sm btn-outline-secondary" title="المرفقات">
+                                        <i class="bi bi-paperclip"></i>
+                                    </a>
+                                </div>
 
                                 <button type="button" class="btn btn-sm btn-outline-danger"
                                     onclick="if(confirm('هل أنت متأكد من الحذف؟')) { document.getElementById('delete-form-{{ $user->id }}').submit(); }"
