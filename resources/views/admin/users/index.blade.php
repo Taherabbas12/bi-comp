@@ -52,9 +52,14 @@
                     <div class="card text-white bg-dark border-light h-100 shadow-sm">
                         <div class="card-body d-flex flex-column">
 
-                            <!-- Name & Role -->
+                            <!-- Name & Role & Position -->
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0 text-truncate">{{ $user->name }}</h6>
+                                <div>
+                                    <h6 class="mb-0 text-truncate">{{ $user->name }}</h6>
+                                    @if ($user->position)
+                                        <small class="text-warning d-block">{{ $user->position }}</small>
+                                    @endif
+                                </div>
                                 @if ($user->role)
                                     <span class="badge bg-primary">{{ $user->role->name }}</span>
                                 @else
@@ -62,7 +67,7 @@
                                 @endif
                             </div>
 
-                            <!-- Info -->
+                            <!-- Contact Info -->
                             <small class="text-muted text-truncate">
                                 <i class="bi bi-envelope"></i> {{ $user->email }}
                             </small>
@@ -71,6 +76,32 @@
                                 <i class="bi bi-telephone"></i>
                                 {{ $user->phone ?? '—' }}
                             </small>
+
+                            <!-- Employment Info -->
+                            @if ($user->salary || $user->employment_type || $user->department)
+                                <div class="mt-3 pt-3 border-top border-secondary">
+                                    @if ($user->salary)
+                                        <small class="d-block text-success fw-bold">
+                                            💰 {{ number_format($user->salary, 0) }} {{ $user->salary_currency ?? 'IQD' }}
+                                        </small>
+                                    @endif
+                                    @if ($user->employment_type)
+                                        <small class="d-block text-info">
+                                            <span class="badge bg-info bg-opacity-50">{{ $user->employment_type }}</span>
+                                        </small>
+                                    @endif
+                                    @if ($user->department)
+                                        <small class="d-block text-secondary">
+                                            📊 {{ $user->department }}
+                                        </small>
+                                    @endif
+                                    @if ($user->hire_date)
+                                        <small class="d-block text-muted">
+                                            📅 {{ \Carbon\Carbon::parse($user->hire_date)->format('Y-m-d') }}
+                                        </small>
+                                    @endif
+                                </div>
+                            @endif
 
                             <!-- Actions -->
                             <div class="mt-auto pt-3 d-grid grid-actions">

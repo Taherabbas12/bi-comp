@@ -78,6 +78,13 @@ class UserController extends Controller
             'gender' => 'nullable|in:male,female',
             'national_id' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
+
+            'salary' => 'nullable|numeric|min:0',
+            'salary_currency' => 'nullable|string|max:10',
+            'employment_type' => 'nullable|in:full-time,part-time,contract,temporary',
+            'department' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'hire_date' => 'nullable|date',
         ]);
 
         $user = User::create([
@@ -93,6 +100,13 @@ class UserController extends Controller
             'gender' => $request->gender,
             'national_id' => $request->national_id,
             'notes' => $request->notes,
+
+            'salary' => $request->salary,
+            'salary_currency' => $request->salary_currency ?? 'IQD',
+            'employment_type' => $request->employment_type,
+            'department' => $request->department,
+            'position' => $request->position,
+            'hire_date' => $request->hire_date,
         ]);
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
@@ -122,6 +136,13 @@ class UserController extends Controller
             'gender' => 'nullable|in:male,female',
             'national_id' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
+
+            'salary' => 'nullable|numeric|min:0',
+            'salary_currency' => 'nullable|string|max:10',
+            'employment_type' => 'nullable|in:full-time,part-time,contract,temporary',
+            'department' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'hire_date' => 'nullable|date',
         ]);
 
         $user->update($request->only([
@@ -135,6 +156,13 @@ class UserController extends Controller
             'gender',
             'national_id',
             'notes',
+
+            'salary',
+            'salary_currency',
+            'employment_type',
+            'department',
+            'position',
+            'hire_date',
         ]));
 
         if ($request->filled('password')) {

@@ -77,6 +77,58 @@
 
                             <hr class="border-secondary my-4">
 
+                            <!-- Employment & Salary Section -->
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <h6 class="text-info">💼 بيانات التوظيف والراتب</h6>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label>💰 الراتب</label>
+                                    <input type="number" name="salary" class="form-control" step="0.01"
+                                        value="{{ $user->salary }}">
+                                    <small class="text-muted">أترك فارغاً إذا لم يكن هناك راتب</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>💱 العملة</label>
+                                    <input type="text" name="salary_currency" class="form-control"
+                                        value="{{ $user->salary_currency ?? 'IQD' }}" placeholder="IQD">
+                                    <small class="text-muted">مثال: IQD, USD, EUR</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>📊 القسم</label>
+                                    <input type="text" name="department" class="form-control"
+                                        value="{{ $user->department }}" placeholder="مثال: تطوير التطبيقات">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>🎯 المسمى الوظيفي</label>
+                                    <input type="text" name="position" class="form-control"
+                                        value="{{ $user->position }}" placeholder="مثال: مهندس برمجيات">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>📋 نوع التوظيف</label>
+                                    <select name="employment_type" class="form-control">
+                                        <option value="">— اختر —</option>
+                                        <option value="full-time" {{ $user->employment_type == 'full-time' ? 'selected' : '' }}>دوام كامل</option>
+                                        <option value="part-time" {{ $user->employment_type == 'part-time' ? 'selected' : '' }}>دوام جزئي</option>
+                                        <option value="contract" {{ $user->employment_type == 'contract' ? 'selected' : '' }}>عقد</option>
+                                        <option value="temporary" {{ $user->employment_type == 'temporary' ? 'selected' : '' }}>مؤقت</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>📅 تاريخ التعيين</label>
+                                    <input type="date" name="hire_date" class="form-control"
+                                        value="{{ optional($user->hire_date)->format('Y-m-d') }}">
+                                </div>
+                            </div>
+
+                            <hr class="border-secondary my-4">
+
                             <div class="mb-3">
                                 <label>الدور</label>
                                 <select name="role_id" class="form-control">

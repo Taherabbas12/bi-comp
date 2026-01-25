@@ -82,13 +82,65 @@
 
                             <hr class="border-secondary my-4">
 
+                            {{-- بيانات التوظيف والراتب --}}
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <h6 class="text-info">💼 بيانات التوظيف والراتب</h6>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label>💰 الراتب</label>
+                                    <input type="number" name="salary" class="form-control" step="0.01"
+                                        value="{{ old('salary') }}" placeholder="0.00">
+                                    <small class="text-muted">أترك فارغاً إذا لم يكن هناك راتب</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>💱 العملة</label>
+                                    <input type="text" name="salary_currency" class="form-control"
+                                        value="{{ old('salary_currency', 'IQD') }}" placeholder="IQD">
+                                    <small class="text-muted">مثال: IQD, USD, EUR</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>📊 القسم</label>
+                                    <input type="text" name="department" class="form-control"
+                                        value="{{ old('department') }}" placeholder="مثال: تطوير التطبيقات">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>🎯 المسمى الوظيفي</label>
+                                    <input type="text" name="position" class="form-control"
+                                        value="{{ old('position') }}" placeholder="مثال: مهندس برمجيات">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>📋 نوع التوظيف</label>
+                                    <select name="employment_type" class="form-control">
+                                        <option value="">— اختر —</option>
+                                        <option value="full-time" {{ old('employment_type') == 'full-time' ? 'selected' : '' }}>دوام كامل</option>
+                                        <option value="part-time" {{ old('employment_type') == 'part-time' ? 'selected' : '' }}>دوام جزئي</option>
+                                        <option value="contract" {{ old('employment_type') == 'contract' ? 'selected' : '' }}>عقد</option>
+                                        <option value="temporary" {{ old('employment_type') == 'temporary' ? 'selected' : '' }}>مؤقت</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>📅 تاريخ التعيين</label>
+                                    <input type="date" name="hire_date" class="form-control"
+                                        value="{{ old('hire_date') }}">
+                                </div>
+                            </div>
+
+                            <hr class="border-secondary my-4">
+
                             {{-- الدور --}}
                             <div class="mb-3">
                                 <label>الدور</label>
                                 <select name="role_id" class="form-control">
                                     <option value="">لا تعيين</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
                                     @endforeach
                                 </select>
                             </div>

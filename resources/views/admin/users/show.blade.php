@@ -20,6 +20,11 @@
                     <div class="card-body">
                         <div class="row g-3">
 
+                            <!-- Personal Info Section -->
+                            <div class="col-12">
+                                <h6 class="text-warning border-bottom border-secondary pb-2">👤 البيانات الشخصية</h6>
+                            </div>
+
                             <div class="col-12 col-md-6">
                                 <p><strong>👤 الاسم:</strong><br>{{ $user->name }}</p>
                                 <p><strong>📧 البريد:</strong><br>{{ $user->email }}</p>
@@ -36,11 +41,45 @@
                                 <p><strong>📍 العنوان:</strong><br>{{ $user->address ?? '—' }}</p>
                             </div>
 
+                            <!-- Employment Info Section -->
+                            <div class="col-12 mt-3">
+                                <h6 class="text-info border-bottom border-secondary pb-2">💼 بيانات التوظيف والراتب</h6>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <p><strong>💰 الراتب:</strong><br>
+                                    @if ($user->salary)
+                                        <span class="text-success fw-bold">
+                                            {{ number_format($user->salary, 2) }} {{ $user->salary_currency ?? 'IQD' }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </p>
+                                <p><strong>📊 القسم:</strong><br>{{ $user->department ?? '—' }}</p>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <p><strong>🎯 المسمى الوظيفي:</strong><br>{{ $user->position ?? '—' }}</p>
+                                <p><strong>📋 نوع التوظيف:</strong><br>
+                                    @if ($user->employment_type)
+                                        <span class="badge bg-info">{{ $user->employment_type }}</span>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </p>
+                                <p><strong>📅 تاريخ التعيين:</strong><br>
+                                    {{ $user->hire_date ? \Carbon\Carbon::parse($user->hire_date)->format('Y-m-d') : '—' }}
+                                </p>
+                            </div>
+
+                            <!-- Notes Section -->
                             <div class="col-12">
                                 <hr class="border-secondary">
                                 <p><strong>📝 ملاحظات:</strong><br>{{ $user->notes ?? '—' }}</p>
                             </div>
 
+                            <!-- Role Section -->
                             <div class="col-12">
                                 <p>
                                     <strong>🎭 الدور:</strong>
