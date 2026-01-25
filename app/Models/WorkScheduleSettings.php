@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class WorkScheduleSettings extends Model
 {
@@ -46,6 +47,7 @@ class WorkScheduleSettings extends Model
     public static function current()
     {
         return self::first() ?? self::create([
+            'id' => (string) Str::uuid(),
             'official_check_in' => '09:00:00',
             'official_check_out' => '17:00:00',
             'working_hours' => 8,
