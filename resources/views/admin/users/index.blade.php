@@ -116,9 +116,9 @@
                                         <i class="bi bi-pencil"></i>
                                     </a>
 
-                                    <a href="{{ route('work-schedules.edit', $user) }}"
-                                        class="btn btn-sm btn-outline-warning" title="أوقات العمل">
-                                        <i class="bi bi-clock"></i>
+                                    <a href="{{ route('user-work-schedules.edit', $user) }}"
+                                        class="btn btn-sm btn-outline-warning" title="جدول العمل">
+                                        <i class="bi bi-calendar-week"></i>
                                     </a>
 
                                     <a href="{{ route('admin.attachments.index', $user) }}"
