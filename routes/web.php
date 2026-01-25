@@ -10,8 +10,7 @@ use App\Http\Controllers\Admin\TaskController as AdminTaskController;
 use App\Http\Controllers\Admin\TaskStatusController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\WorkScheduleController;
-use App\Http\Controllers\Admin\WorkScheduleSettingsController;
-use App\Http\Controllers\Admin\UserDayOffController;
+use App\Http\Controllers\Admin\UserWorkScheduleController;
 use App\Http\Controllers\Admin\UserAttachmentController;
 use App\Http\Controllers\Customer\LaptopController as CustomerLaptopController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
@@ -245,30 +244,12 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/work-schedules/{user}/edit', [WorkScheduleController::class, 'edit'])
-            ->name('work-schedules.edit')
+        Route::get('/users/{user}/work-schedules/edit', [UserWorkScheduleController::class, 'edit'])
+            ->name('user-work-schedules.edit')
             ->middleware('permission:edit_users');
 
-        Route::put('/work-schedules/{user}', [WorkScheduleController::class, 'update'])
-            ->name('work-schedules.update')
-            ->middleware('permission:edit_users');
-
-        // Work Schedule Settings
-        Route::get('/work-schedule-settings/edit', [WorkScheduleSettingsController::class, 'edit'])
-            ->name('work-schedule-settings.edit')
-            ->middleware('permission:edit_users');
-
-        Route::put('/work-schedule-settings', [WorkScheduleSettingsController::class, 'update'])
-            ->name('work-schedule-settings.update')
-            ->middleware('permission:edit_users');
-
-        // User Day Offs
-        Route::get('/users/{user}/day-offs/edit', [UserDayOffController::class, 'edit'])
-            ->name('user-day-offs.edit')
-            ->middleware('permission:edit_users');
-
-        Route::put('/users/{user}/day-offs', [UserDayOffController::class, 'update'])
-            ->name('user-day-offs.update')
+        Route::put('/users/{user}/work-schedules', [UserWorkScheduleController::class, 'update'])
+            ->name('user-work-schedules.update')
             ->middleware('permission:edit_users');
 
         /*

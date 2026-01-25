@@ -99,11 +99,8 @@
                                 <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
                                     ← رجوع
                                 </a>
-                                <a href="{{ route('work-schedules.edit', $user) }}" class="btn btn-sm btn-outline-info">
-                                    <i class="bi bi-clock"></i> أوقات العمل
-                                </a>
-                                <a href="{{ route('user-day-offs.edit', $user) }}" class="btn btn-sm btn-outline-success">
-                                    <i class="bi bi-moon"></i> يوم الإجازة
+                                <a href="{{ route('user-work-schedules.edit', $user) }}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-calendar-week"></i> جدول العمل
                                 </a>
                                 <a href="{{ route('admin.attachments.index', $user) }}"
                                     class="btn btn-sm btn-outline-warning">

@@ -91,10 +91,10 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id'); // <-- تأكد من وجود role_id في جدول users
     }
 
-    // علاقة: الموظف يملك جدول عمل واحد أو أكثر
+    // علاقة: الموظف يملك جدول عمل لكل أيام الأسبوع
     public function workSchedules()
     {
-        return $this->hasMany(WorkSchedule::class);
+        return $this->hasMany(UserWorkSchedule::class);
     }
 
     // علاقة: الموظف يملك سجلات حضور
