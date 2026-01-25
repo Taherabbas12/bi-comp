@@ -24,7 +24,10 @@ class AttendanceController extends Controller
             ->where('is_active', true)->first();
 
         if (!$qr) {
-            return response()->json(['status' => false, 'message' => 'QR غير صالح'], 422);
+            return response()->json([
+                'status' => false,
+                'message' => '❌ رمز QR غير صالح أو منتهي الصلاحية. يرجى استخدام رمز صحيح.'
+            ], 422);
         }
 
         $user = Auth::user();
@@ -51,7 +54,11 @@ class AttendanceController extends Controller
             ->first();
 
         if ($existingOpenSession) {
-            return response()->json(['status' => false, 'message' => 'جلسة مفتوحة موجودة بالفعل'], 422);
+            $checkInTime = $existingOpenSession->check_in_at->format('H:i:s');
+            return response()->json([
+                'status' => false,
+                'message' => '⚠️ لديك جلسة عمل مفتوحة بدأت في ' . $checkInTime . '. يجب إغلاقها أولاً.'
+            ], 422);
         }
 
         $workDate = $now->hour < 3
@@ -70,7 +77,13 @@ class AttendanceController extends Controller
             'source' => 'qr'
         ]);
 
-        return response()->json(['status' => true, 'message' => '✅ تم تسجيل الحضور']);
+        return response()->json([
+            'status' => true,
+            'message' => '✅ تم تسجيل الحضور بنجاح - الساعة: ' . $now->format('H:i:s') . ' - المسافة: ' . $distance . ' متر'
+        ]);
+            'status' => true,
+            'message' => '✅ تم تسجيل الحضور بنجاح - الوقت: ' . $now->format('H:i:s')
+        ]);
     }
 
     /* ===================== CHECK OUT ===================== */
@@ -102,8 +115,7 @@ class AttendanceController extends Controller
         if ($distance > 12) {
             return response()->json([
                 'status' => false,
-                'message' => '❌ خارج الشركة',
-                'distance' => $distance
+                'message' => '❌ أنت خارج الموقع المسموح به للانصراف. المسافة: ' . $distance . ' متر (المسافة المسموح بها: 12 متر)'
             ], 403);
         }
 
@@ -114,7 +126,10 @@ class AttendanceController extends Controller
             ->first();
 
         if (!$attendance) {
-            return response()->json(['status' => false, 'message' => 'لا توجد جلسة مفتوحة'], 422);
+            return response()->json([
+                'status' => false,
+                'message' => '❌ لا توجد جلسة عمل مفتوحة. يرجى تسجيل الحضور أولاً.'
+            ], 422);
         }
 
         // ✅ التحقق: هل الانصراف مسموح به ضمن حدود يوم العمل؟
@@ -136,8 +151,12 @@ class AttendanceController extends Controller
         }
 
         // التحقق من الحد الأدنى (30 دقيقة)
-        if ($attendance->check_in_at->diffInMinutes($now) < 30) {
-            return response()->json(['status' => false, 'message' => '❌ الحد الأدنى 30 دقيقة'], 422);
+        $minutesWorked = $attendance->check_in_at->diffInMinutes($now);
+        if ($minutesWorked < 30) {
+            return response()->json([
+                'status' => false,
+                'message' => '⏱️ وقت العمل قصير جداً. الحد الأدنى 30 دقيقة. لقد عملت ' . $minutesWorked . ' دقيقة فقط.'
+            ], 422);
         }
 
         // تحديث الانصراف
@@ -147,7 +166,10 @@ class AttendanceController extends Controller
             'lng' => $request->lng
         ]);
 
-        return response()->json(['status' => true, 'message' => '🚪 تم تسجيل الانصراف']);
+        return response()->json([
+            'status' => true,
+            'message' => '✅ تم تسجيل الانصراف بنجاح - الساعة: ' . $now->format('H:i:s') . ' - مدة العمل: ' . $minutesWorked . ' دقيقة'
+        ]);
     }
 
     /* ===================== HANDLE FORGOTTEN SESSION ===================== */
