@@ -10,7 +10,7 @@ class TestAttendanceController extends Controller
     public function testUserData()
     {
         $user = User::first();
-        
+
         if (!$user) {
             return response()->json(['error' => 'No users found']);
         }
@@ -32,7 +32,7 @@ class TestAttendanceController extends Controller
     public function testDatabaseSchema()
     {
         $schema = \Illuminate\Support\Facades\Schema::getColumnListing('users');
-        
+
         return response()->json([
             'users_table_columns' => $schema,
             'has_salary' => in_array('salary', $schema),

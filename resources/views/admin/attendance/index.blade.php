@@ -291,7 +291,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small">الراتب الشهري</label>
                                 <div class="h6 text-success fw-bold">
-                                    @if($attendanceSummary['salary'])
+                                    @if ($attendanceSummary['salary'])
                                         {{ number_format($attendanceSummary['salary'], 2) }}
                                         {{ $attendanceSummary['salary_currency'] ?? 'IQD' }}
                                     @else
