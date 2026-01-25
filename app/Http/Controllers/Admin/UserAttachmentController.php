@@ -40,10 +40,16 @@ class UserAttachmentController extends Controller
     public function store(Request $request, User $user)
     {
         $validated = $request->validate([
-            'file' => 'required|file|max:10240', // 10MB max
+            'file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,gif,webp,doc,docx',
             'attachment_type' => 'required|in:id_card,passport,driver_license,birth_certificate,profile_picture,contract,cv,certificate,insurance,bank_account,other',
             'description' => 'nullable|string|max:500',
             'is_primary' => 'nullable|boolean',
+        ], [
+            'file.required' => 'يجب اختيار ملف',
+            'file.max' => 'حجم الملف لا يجب أن يتجاوز 10 MB',
+            'file.mimes' => 'نوع الملف غير مدعوم. الأنواع المدعومة: PDF، JPG، PNG، DOC، DOCX',
+            'attachment_type.required' => 'نوع المرفق مطلوب',
+            'description.max' => 'الوصف لا يجب أن يتجاوز 500 حرف',
         ]);
 
         try {
@@ -75,10 +81,10 @@ class UserAttachmentController extends Controller
             }
 
             return redirect()->route('admin.attachments.index', $user)
-                ->with('success', 'تم رفع المرفق بنجاح');
+                ->with('success', 'تم رفع المرفق بنجاح ✓');
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'حدث خطأ أثناء رفع الملف: ' . $e->getMessage());
+            return redirect()->back()->withInput()
+                ->with('error', 'حدث خطأ أثناء رفع الملف. يرجى التحقق من حجم الملف والصيغة المدعومة');
         }
     }
 
@@ -102,7 +108,7 @@ class UserAttachmentController extends Controller
             $attachment->delete();
 
             return redirect()->route('admin.attachments.index', $user)
-                ->with('success', 'تم حذف المرفق بنجاح');
+                ->with('success', 'تم حذف المرفق بنجاح ✓');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'حدث خطأ أثناء حذف الملف');
@@ -145,6 +151,6 @@ class UserAttachmentController extends Controller
         $attachment->update(['is_primary' => true]);
 
         return redirect()->route('admin.attachments.index', $user)
-            ->with('success', 'تم تحديث المرفق الأساسي');
+            ->with('success', 'تم تحديث المرفق الأساسي بنجاح ✓');
     }
 }

@@ -50,11 +50,18 @@ class UserWorkScheduleController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'schedules' => 'required|array',
+            'schedules' => 'required|array|size:7',
             'schedules.*.day_of_week' => 'required|integer|between:1,7',
             'schedules.*.is_day_off' => 'nullable|boolean',
-            'schedules.*.check_in' => 'nullable|date_format:H:i',
-            'schedules.*.check_out' => 'nullable|date_format:H:i',
+            'schedules.*.check_in' => 'nullable|date_format:H:i|required_if:schedules.*.is_day_off,0',
+            'schedules.*.check_out' => 'nullable|date_format:H:i|required_if:schedules.*.is_day_off,0|after:schedules.*.check_in',
+        ], [
+            'schedules.size' => 'يجب تحديد جميع أيام الأسبوع (7 أيام)',
+            'schedules.*.check_in.required_if' => 'وقت الدخول مطلوب للأيام التي لا تكون عطلة',
+            'schedules.*.check_out.required_if' => 'وقت الخروج مطلوب للأيام التي لا تكون عطلة',
+            'schedules.*.check_out.after' => 'وقت الخروج يجب أن يكون بعد وقت الدخول',
+            'schedules.*.check_in.date_format' => 'صيغة وقت الدخول غير صحيحة (استخدم HH:mm)',
+            'schedules.*.check_out.date_format' => 'صيغة وقت الخروج غير صحيحة (استخدم HH:mm)',
         ]);
 
         foreach ($validated['schedules'] as $schedule) {
@@ -74,6 +81,6 @@ class UserWorkScheduleController extends Controller
             );
         }
 
-        return redirect()->back()->with('success', 'تم تحديث جدول العمل بنجاح');
+        return redirect()->back()->with('success', 'تم تحديث جدول العمل بنجاح ✓');
     }
 }
