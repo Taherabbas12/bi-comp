@@ -95,12 +95,16 @@
 
                         <!-- Footer -->
                         <div class="d-flex justify-content-between align-items-center mt-4 gap-2">
-                            <div>
+                            <div class="d-flex gap-2">
                                 <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
                                     ← رجوع
                                 </a>
                                 <a href="{{ route('work-schedules.edit', $user) }}" class="btn btn-sm btn-outline-info">
                                     <i class="bi bi-clock"></i> أوقات العمل
+                                </a>
+                                <a href="{{ route('admin.attachments.index', $user) }}"
+                                    class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-paperclip"></i> المرفقات
                                 </a>
                             </div>
                             <small class="text-muted">

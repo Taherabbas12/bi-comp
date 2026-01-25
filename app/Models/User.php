@@ -103,6 +103,12 @@ class User extends Authenticatable
         return $this->hasMany(Attendance::class);
     }
 
+    // علاقة: الموظف يملك مرفقات
+    public function attachments()
+    {
+        return $this->hasMany(UserAttachment::class);
+    }
+
     // دالة للتحقق من صلاحية المستخدم (Will be used in middleware/policies)
     public function hasPermission($permissionName)
     {

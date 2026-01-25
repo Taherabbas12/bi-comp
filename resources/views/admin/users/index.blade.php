@@ -106,13 +106,13 @@
                             <!-- Actions -->
                             <div class="mt-auto pt-3 d-flex gap-2">
                                 <div class="btn-group w-100" role="group">
-                                    <a href="{{ route('admin.users.show', $user) }}"
-                                        class="btn btn-sm btn-outline-info" title="عرض">
+                                    <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-info"
+                                        title="عرض">
                                         <i class="bi bi-eye"></i>
                                     </a>
 
-                                    <a href="{{ route('admin.users.edit', $user) }}"
-                                        class="btn btn-sm btn-outline-primary" title="تعديل">
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary"
+                                        title="تعديل">
                                         <i class="bi bi-pencil"></i>
                                     </a>
 

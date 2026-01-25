@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\TaskController as AdminTaskController;
 use App\Http\Controllers\Admin\TaskStatusController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\WorkScheduleController;
+use App\Http\Controllers\Admin\UserAttachmentController;
 use App\Http\Controllers\Customer\LaptopController as CustomerLaptopController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Employee\EmployeeDashboardController;
@@ -248,6 +249,32 @@ Route::prefix('admin')
 
         Route::put('/work-schedules/{user}', [WorkScheduleController::class, 'update'])
             ->name('work-schedules.update')
+            ->middleware('permission:edit_users');
+
+        /*
+        |--------------------------------------------------------------------------
+        | User Attachments (Admin)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/users/{user}/attachments', [UserAttachmentController::class, 'index'])
+            ->name('admin.attachments.index')
+            ->middleware('permission:view_users');
+
+        Route::post('/users/{user}/attachments', [UserAttachmentController::class, 'store'])
+            ->name('admin.attachments.store')
+            ->middleware('permission:edit_users');
+
+        Route::delete('/users/{user}/attachments/{attachment}', [UserAttachmentController::class, 'destroy'])
+            ->name('admin.attachments.destroy')
+            ->middleware('permission:edit_users');
+
+        Route::get('/users/{user}/attachments/{attachment}/download', [UserAttachmentController::class, 'download'])
+            ->name('admin.attachments.download')
+            ->middleware('permission:view_users');
+
+        Route::put('/users/{user}/attachments/{attachment}/primary', [UserAttachmentController::class, 'setPrimary'])
+            ->name('admin.attachments.setPrimary')
             ->middleware('permission:edit_users');
 
         /*
