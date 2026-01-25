@@ -43,6 +43,46 @@ class AttendanceAdminController extends Controller
 
         $usersCount = $userId ? 1 : User::count();
 
+        // حساب إحصائيات الأسابيع للموظف المختار
+        $weeklyStats = [];
+        if ($userId) {
+            $currentDate = $start->copy();
+            $weekNumber = 1;
+            
+            while ($currentDate <= $end) {
+                $weekStart = $currentDate->copy()->startOfWeek();
+                $weekEnd = $currentDate->copy()->endOfWeek();
+                
+                // تأكد من أن الأسبوع ضمن نطاق الشهر
+                if ($weekStart > $end) break;
+                if ($weekEnd < $start) {
+                    $currentDate->addWeek();
+                    $weekNumber++;
+                    continue;
+                }
+                
+                $weekRecords = Attendance::where('user_id', $userId)
+                    ->whereBetween('work_date', [$weekStart, $weekEnd])
+                    ->get();
+                
+                $weekMinutes = $weekRecords->sum(fn($r) => $r->session_minutes);
+                $weekDays = $weekRecords->count();
+                
+                $weeklyStats[] = [
+                    'week_number' => $weekNumber,
+                    'start' => $weekStart->format('Y-m-d'),
+                    'end' => $weekEnd->format('Y-m-d'),
+                    'days' => $weekDays,
+                    'minutes' => $weekMinutes,
+                    'hours' => intdiv($weekMinutes, 60),
+                    'remaining_minutes' => $weekMinutes % 60,
+                ];
+                
+                $currentDate->addWeek();
+                $weekNumber++;
+            }
+        }
+
         return view('admin.attendance.index', compact(
             'month',
             'start',
@@ -50,7 +90,8 @@ class AttendanceAdminController extends Controller
             'attendanceByDay',
             'usersCount',
             'users',
-            'userId'
+            'userId',
+            'weeklyStats'
         ));
     }
     public function day(string $date, Request $request)

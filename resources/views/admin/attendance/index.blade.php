@@ -118,6 +118,15 @@
             margin-bottom: 2rem;
         }
 
+        .weekly-card {
+            transition: all 0.3s ease;
+        }
+
+        .weekly-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(34, 197, 94, 0.2);
+        }
+
         @media(max-width:768px) {
             .calendar-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -228,6 +237,56 @@
                     <div class="report-label">إجمالي ساعات الحضور</div>
                 </div>
             </div>
+
+            <!-- Weekly Statistics -->
+            @if (!empty($weeklyStats))
+                <div class="mb-4">
+                    <h5 class="mb-3">📊 إحصائيات الحضور الأسبوعية</h5>
+                    <div class="row">
+                        @foreach ($weeklyStats as $week)
+                            <div class="col-12 col-md-6 col-lg-4 mb-3">
+                                <div class="card bg-dark text-light border-light h-100 weekly-card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="card-title mb-0">الأسبوع {{ $week['week_number'] }}</h6>
+                                            @if ($week['days'] > 0)
+                                                <span class="badge bg-success">✔ حاضر</span>
+                                            @else
+                                                <span class="badge bg-danger">❌ غائب</span>
+                                            @endif
+                                        </div>
+                                        <div class="small text-muted mb-3">
+                                            {{ $week['start'] }} إلى {{ $week['end'] }}
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="text-center">
+                                                    <div class="h5 text-success mb-1">{{ $week['days'] }}</div>
+                                                    <div class="small">أيام الحضور</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="text-center">
+                                                    <div class="h5 text-info mb-1">
+                                                        @if ($week['hours'] > 0 && $week['remaining_minutes'] > 0)
+                                                            {{ $week['hours'] }}h<br><small>{{ $week['remaining_minutes'] }}m</small>
+                                                        @elseif ($week['hours'] > 0)
+                                                            {{ $week['hours'] }}h
+                                                        @else
+                                                            {{ $week['remaining_minutes'] }}m
+                                                        @endif
+                                                    </div>
+                                                    <div class="small">ساعات الحضور</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <div class="card bg-dark text-light border-light mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
