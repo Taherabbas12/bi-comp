@@ -48,4 +48,24 @@ class Attendance extends Model
 
         return $this->check_in_at->diffInMinutes($this->check_out_at);
     }
+
+    // تنسيق المدة كساعات ودقائق
+    public function getFormattedDurationAttribute(): string
+    {
+        if (! $this->check_in_at || ! $this->check_out_at) {
+            return '—';
+        }
+
+        $minutes = $this->session_minutes;
+        $hours = intdiv($minutes, 60);
+        $remainingMinutes = $minutes % 60;
+
+        if ($hours > 0 && $remainingMinutes > 0) {
+            return "{$hours}h {$remainingMinutes}m";
+        } elseif ($hours > 0) {
+            return "{$hours}h";
+        } else {
+            return "{$remainingMinutes}m";
+        }
+    }
 }

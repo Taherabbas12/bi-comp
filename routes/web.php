@@ -146,6 +146,8 @@ Route::prefix('admin')
     Route::get('/attendance/user/{id}', [AttendanceAdminController::class, 'userAttendance'])
         ->name('admin.attendance.user');
 
+    Route::put('/attendance/{id}', [AttendanceAdminController::class, 'update'])
+        ->name('admin.attendance.update');
 
         /*
         |--------------------------------------------------------------------------
