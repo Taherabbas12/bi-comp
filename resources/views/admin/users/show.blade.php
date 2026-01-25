@@ -102,6 +102,9 @@
                                 <a href="{{ route('work-schedules.edit', $user) }}" class="btn btn-sm btn-outline-info">
                                     <i class="bi bi-clock"></i> أوقات العمل
                                 </a>
+                                <a href="{{ route('user-day-offs.edit', $user) }}" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-moon"></i> يوم الإجازة
+                                </a>
                                 <a href="{{ route('admin.attachments.index', $user) }}"
                                     class="btn btn-sm btn-outline-warning">
                                     <i class="bi bi-paperclip"></i> المرفقات

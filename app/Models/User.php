@@ -109,6 +109,12 @@ class User extends Authenticatable
         return $this->hasMany(UserAttachment::class);
     }
 
+    // علاقة: الموظف قد يملك أيام إجازة مخصصة
+    public function dayOffs()
+    {
+        return $this->hasMany(UserDayOff::class);
+    }
+
     // دالة للتحقق من صلاحية المستخدم (Will be used in middleware/policies)
     public function hasPermission($permissionName)
     {

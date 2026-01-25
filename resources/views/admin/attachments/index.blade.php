@@ -38,10 +38,12 @@
                                 <!-- Attachment Type -->
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">📋 نوع المرفق</label>
-                                    <select name="attachment_type" class="form-control bg-dark text-light border-secondary" required>
+                                    <select name="attachment_type" class="form-control bg-dark text-light border-secondary"
+                                        required>
                                         <option value="" class="bg-dark text-light">-- اختر --</option>
                                         @foreach ($attachmentTypes as $key => $label)
-                                            <option value="{{ $key }}" class="bg-dark text-light">{{ $label }}</option>
+                                            <option value="{{ $key }}" class="bg-dark text-light">
+                                                {{ $label }}</option>
                                         @endforeach
                                     </select>
                                 </div>

@@ -503,6 +503,13 @@
     </a>
 </li>
                 <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('work-schedule-settings.edit') ? 'active' : '' }}"
+                        href="{{ route('work-schedule-settings.edit') }}">
+                        <i class="bi bi-clock-history"></i>
+                        <span>⚙️ إعدادات أوقات العمل</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.laptops.*') ? 'active' : '' }}"
                         href="{{ route('admin.laptops.index') }}">
                         <i class="bi bi-laptop"></i> <span>إدارة الأجهزة</span>
