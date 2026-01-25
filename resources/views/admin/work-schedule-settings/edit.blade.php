@@ -69,7 +69,8 @@
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">📅 عدد أيام العمل في الأسبوع</label>
                                     <input type="number" name="working_days_per_week" class="form-control"
-                                        value="{{ $settings->working_days_per_week }}" min="1" max="7" required>
+                                        value="{{ $settings->working_days_per_week }}" min="1" max="7"
+                                        required>
                                     @error('working_days_per_week')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror

@@ -22,14 +22,14 @@
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
 
-            --glass-bg: rgba(15,23,42,0.55);
-            --glass-border: rgba(255,255,255,0.08);
+            --glass-bg: rgba(15, 23, 42, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.08);
 
-            --glow-green: 0 0 14px rgba(34,197,94,.6);
-            --glow-blue: 0 0 20px rgba(59,130,246,.6);
+            --glow-green: 0 0 14px rgba(34, 197, 94, .6);
+            --glow-blue: 0 0 20px rgba(59, 130, 246, .6);
 
-            --bottom-bg: rgba(2,6,23,0.75);
-            
+            --bottom-bg: rgba(2, 6, 23, 0.75);
+
             /* --- 💥 تم حذف --scale-factor --- */
         }
 
@@ -43,23 +43,30 @@
             /* 💥 transform: scale(...) محذوف */
             min-height: 100vh;
             width: 100vw;
-            overflow-x: hidden; /* للسماح بالتمرير الأفقي */
+            overflow-x: hidden;
+            /* للسماح بالتمرير الأفقي */
         }
 
         .admin-container {
             padding: 0;
             display: flex;
-            min-height: 100vh; /* 💥 حذف calc و --scale-factor */
+            min-height: 100vh;
+            /* 💥 حذف calc و --scale-factor */
         }
 
         /* ================== 侧边栏导航 (Sidebar) ================== */
         .sidebar {
-            width: 260px; /* 💥 حذف calc و --scale-factor */
-            background: var(--glass-bg); /* 💥 استخدام لون من theme */
-            backdrop-filter: blur(10px); /* 💥 تأثير زجاجي */
+            width: 260px;
+            /* 💥 حذف calc و --scale-factor */
+            background: var(--glass-bg);
+            /* 💥 استخدام لون من theme */
+            backdrop-filter: blur(10px);
+            /* 💥 تأثير زجاجي */
             -webkit-backdrop-filter: blur(10px);
-            border-right: 1px solid var(--glass-border); /* 💥 استخدام لون من theme */
-            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1); /* 💥 حذف calc و --scale-factor */
+            border-right: 1px solid var(--glass-border);
+            /* 💥 استخدام لون من theme */
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+            /* 💥 حذف calc و --scale-factor */
             position: fixed;
             top: 0;
             left: 0;
@@ -72,30 +79,39 @@
         }
 
         .sidebar.hidden {
-            transform: translateX(-100%); /* 💥 حذف calc و --scale-factor */
+            transform: translateX(-100%);
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .sidebar .logo {
-            padding: 20px 15px; /* 💥 حذف calc و --scale-factor */
+            padding: 20px 15px;
+            /* 💥 حذف calc و --scale-factor */
             color: white;
             font-weight: 800;
-            font-size: 1.8em; /* 💥 حذف calc و --scale-factor */
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 💥 حذف calc و --scale-factor */
+            font-size: 1.8em;
+            /* 💥 حذف calc و --scale-factor */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            /* 💥 حذف calc و --scale-factor */
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px; /* 💥 حذف calc و --scale-factor */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* 💥 حذف calc و --scale-factor */
+            gap: 8px;
+            /* 💥 حذف calc و --scale-factor */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .sidebar .logo i {
-            color: var(--neon-blue); /* 💥 استخدام لون من theme */
-            font-size: 1.8em; /* 💥 حذف calc و --scale-factor */
+            color: var(--neon-blue);
+            /* 💥 استخدام لون من theme */
+            font-size: 1.8em;
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .sidebar-menu {
             list-style: none;
-            padding: 15px 0; /* 💥 حذف calc و --scale-factor */
+            padding: 15px 0;
+            /* 💥 حذف calc و --scale-factor */
             margin: 0;
             flex-grow: 1;
         }
@@ -107,52 +123,69 @@
         .sidebar-menu .nav-link {
             color: rgba(255, 255, 255, 0.8) !important;
             text-decoration: none !important;
-            padding: 12px 20px !important; /* 💥 حذف calc و --scale-factor */
-            border-radius: 0 12px 12px 0 !important; /* 💥 حذف calc و --scale-factor */
+            padding: 12px 20px !important;
+            /* 💥 حذف calc و --scale-factor */
+            border-radius: 0 12px 12px 0 !important;
+            /* 💥 حذف calc و --scale-factor */
             font-weight: 600 !important;
             transition: all 0.3s ease !important;
             display: flex;
             align-items: center;
-            gap: 12px; /* 💥 حذف calc و --scale-factor */
-            margin: 0 10px 5px 10px; /* 💥 حذف calc و --scale-factor */
+            gap: 12px;
+            /* 💥 حذف calc و --scale-factor */
+            margin: 0 10px 5px 10px;
+            /* 💥 حذف calc و --scale-factor */
             border-left: 4px solid transparent;
         }
 
         .sidebar-menu .nav-link:hover,
         .sidebar-menu .nav-link.active {
-            background: rgba(52, 152, 219, 0.2) !important; /* 💥 استخدام لون من theme */
+            background: rgba(52, 152, 219, 0.2) !important;
+            /* 💥 استخدام لون من theme */
             color: white !important;
-            border-left-color: var(--neon-blue); /* 💥 استخدام لون من theme */
+            border-left-color: var(--neon-blue);
+            /* 💥 استخدام لون من theme */
         }
 
         .sidebar-menu .nav-link i {
-            font-size: 1.2em; /* 💥 حذف calc و --scale-factor */
-            width: 24px; /* 💥 حذف calc و --scale-factor */
+            font-size: 1.2em;
+            /* 💥 حذف calc و --scale-factor */
+            width: 24px;
+            /* 💥 حذف calc و --scale-factor */
             text-align: center;
         }
 
         .sidebar-footer {
-            padding: 15px; /* 💥 حذف calc و --scale-factor */
-            border-top: 1px solid rgba(255, 255, 255, 0.2); /* 💥 حذف calc و --scale-factor */
+            padding: 15px;
+            /* 💥 حذف calc و --scale-factor */
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            /* 💥 حذف calc و --scale-factor */
             display: flex;
             flex-direction: column;
-            gap: 10px; /* 💥 حذف calc و --scale-factor */
+            gap: 10px;
+            /* 💥 حذف calc و --scale-factor */
         }
 
         /* ================== 顶部栏 (Top Bar) ================== */
         .top-bar-container {
-            background: var(--glass-bg); /* 💥 استخدام لون من theme */
-            backdrop-filter: blur(10px); /* 💥 تأثير زجاجي */
+            background: var(--glass-bg);
+            /* 💥 استخدام لون من theme */
+            backdrop-filter: blur(10px);
+            /* 💥 تأثير زجاجي */
             -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--glass-border); /* 💥 استخدام لون من theme */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 💥 حذف calc و --scale-factor */
+            border-bottom: 1px solid var(--glass-border);
+            /* 💥 استخدام لون من theme */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            /* 💥 حذف calc و --scale-factor */
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 999;
-            padding: 0 15px; /* 💥 حذف calc و --scale-factor */
-            height: 60px; /* 💥 حذف calc و --scale-factor */
+            padding: 0 15px;
+            /* 💥 حذف calc و --scale-factor */
+            height: 60px;
+            /* 💥 حذف calc و --scale-factor */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -162,13 +195,16 @@
             background: none;
             border: none;
             color: white;
-            font-size: 1.8em; /* 💥 حذف calc و --scale-factor */
+            font-size: 1.8em;
+            /* 💥 حذف calc و --scale-factor */
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px; /* 💥 حذف calc و --scale-factor */
-            height: 40px; /* 💥 حذف calc و --scale-factor */
+            width: 40px;
+            /* 💥 حذف calc و --scale-factor */
+            height: 40px;
+            /* 💥 حذف calc و --scale-factor */
             border-radius: 50%;
             transition: background 0.3s ease;
         }
@@ -180,30 +216,42 @@
         .top-bar-info {
             display: flex;
             align-items: center;
-            gap: 15px; /* 💥 حذف calc و --scale-factor */
+            gap: 15px;
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .top-bar-info .info-item {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px); /* 💥 حذف calc و --scale-factor */
-            border-radius: 12px; /* 💥 حذف calc و --scale-factor */
-            padding: 6px 12px; /* 💥 حذف calc و --scale-factor */
-            font-size: 0.85em; /* 💥 حذف calc و --scale-factor */
-            border: 1px solid rgba(255, 255, 255, 0.2); /* 💥 حذف calc و --scale-factor */
+            backdrop-filter: blur(5px);
+            /* 💥 حذف calc و --scale-factor */
+            border-radius: 12px;
+            /* 💥 حذف calc و --scale-factor */
+            padding: 6px 12px;
+            /* 💥 حذف calc و --scale-factor */
+            font-size: 0.85em;
+            /* 💥 حذف calc و --scale-factor */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* 💥 حذف calc و --scale-factor */
             display: flex;
             align-items: center;
-            gap: 6px; /* 💥 حذف calc و --scale-factor */
+            gap: 6px;
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .top-bar-info .info-item i {
-            font-size: 1em; /* 💥 حذف calc و --scale-factor */
-            color: var(--neon-blue); /* 💥 استخدام لون من theme */
+            font-size: 1em;
+            /* 💥 حذف calc و --scale-factor */
+            color: var(--neon-blue);
+            /* 💥 استخدام لون من theme */
         }
 
         .top-bar .logout-btn {
-            border-radius: 12px; /* 💥 حذف calc و --scale-factor */
-            padding: 8px 16px; /* 💥 حذف calc و --scale-factor */
-            font-size: 0.9em; /* 💥 حذف calc و --scale-factor */
+            border-radius: 12px;
+            /* 💥 حذف calc و --scale-factor */
+            padding: 8px 16px;
+            /* 💥 حذف calc و --scale-factor */
+            font-size: 0.9em;
+            /* 💥 حذف calc و --scale-factor */
             color: #e74c3c !important;
             border-color: #e74c3c !important;
             background: rgba(231, 76, 60, 0.1) !important;
@@ -216,11 +264,15 @@
         /* ================== 主要内容区域 ================== */
         .content-wrapper {
             flex: 1;
-            margin-top: 60px; /* 💥 حذف calc و --scale-factor */
-            margin-left: 260px; /* 💥 حذف calc و --scale-factor */
-            padding: 20px; /* 💥 حذف calc و --scale-factor */
+            margin-top: 60px;
+            /* 💥 حذف calc و --scale-factor */
+            margin-left: 260px;
+            /* 💥 حذف calc و --scale-factor */
+            padding: 20px;
+            /* 💥 حذف calc و --scale-factor */
             transition: margin-left 0.3s ease;
-            padding-bottom: 92px; /* 💥 إضافة مساحة من الأسفل لتفادي تغطية الـ Bottom Nav */
+            padding-bottom: 92px;
+            /* 💥 إضافة مساحة من الأسفل لتفادي تغطية الـ Bottom Nav */
         }
 
         .content-wrapper.shifted {
@@ -228,30 +280,42 @@
         }
 
         .content {
-            padding-top: 20px; /* 💥 حذف calc و --scale-factor */
+            padding-top: 20px;
+            /* 💥 حذف calc و --scale-factor */
         }
 
         /* ================== 卡片样式 ================== */
         .header {
-            background: var(--glass-bg); /* 💥 استخدام لون من theme */
-            backdrop-filter: blur(10px); /* 💥 تأثير زجاجي */
-            border-radius: 20px; /* 💥 حذف calc و --scale-factor */
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); /* 💥 حذف calc و --scale-factor */
-            padding: 30px; /* 💥 حذف calc و --scale-factor */
-            margin: 20px 0 30px 0; /* 💥 حذف calc و --scale-factor */
+            background: var(--glass-bg);
+            /* 💥 استخدام لون من theme */
+            backdrop-filter: blur(10px);
+            /* 💥 تأثير زجاجي */
+            border-radius: 20px;
+            /* 💥 حذف calc و --scale-factor */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            /* 💥 حذف calc و --scale-factor */
+            padding: 30px;
+            /* 💥 حذف calc و --scale-factor */
+            margin: 20px 0 30px 0;
+            /* 💥 حذف calc و --scale-factor */
             text-align: center;
             position: relative;
             overflow: hidden;
-            border: 1px solid var(--glass-border); /* 💥 استخدام لون من theme */
+            border: 1px solid var(--glass-border);
+            /* 💥 استخدام لون من theme */
         }
 
         .header::before {
             content: "";
             position: absolute;
-            top: -50%; /* 💥 حذف calc و --scale-factor */
-            left: -50%; /* 💥 حذف calc و --scale-factor */
-            width: 200%; /* 💥 حذف calc و --scale-factor */
-            height: 200%; /* 💥 حذف calc و --scale-factor */
+            top: -50%;
+            /* 💥 حذف calc و --scale-factor */
+            left: -50%;
+            /* 💥 حذف calc و --scale-factor */
+            width: 200%;
+            /* 💥 حذف calc و --scale-factor */
+            height: 200%;
+            /* 💥 حذف calc و --scale-factor */
             background: linear-gradient(45deg, transparent, rgba(52, 152, 219, 0.1), transparent);
             transform: rotate(30deg);
             z-index: -1;
@@ -260,37 +324,50 @@
         h1 {
             color: white;
             font-weight: 800;
-            font-size: 2.8em; /* 💥 حذف calc و --scale-factor */
-            margin-bottom: 5px; /* 💥 حذف calc و --scale-factor */
-            letter-spacing: -1px; /* 💥 حذف calc و --scale-factor */
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 💥 حذف calc و --scale-factor */
+            font-size: 2.8em;
+            /* 💥 حذف calc و --scale-factor */
+            margin-bottom: 5px;
+            /* 💥 حذف calc و --scale-factor */
+            letter-spacing: -1px;
+            /* 💥 حذف calc و --scale-factor */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .subtitle {
             color: #ecf0f1;
-            font-size: 1.3em; /* 💥 حذف calc و --scale-factor */
+            font-size: 1.3em;
+            /* 💥 حذف calc و --scale-factor */
             font-weight: 500;
         }
 
         .card {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px); /* 💥 تأثير زجاجي */
-            border: 1px solid var(--glass-border); /* 💥 استخدام لون من theme */
+            backdrop-filter: blur(5px);
+            /* 💥 تأثير زجاجي */
+            border: 1px solid var(--glass-border);
+            /* 💥 استخدام لون من theme */
             color: white;
-            border-radius: 18px; /* 💥 حذف calc و --scale-factor */
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* 💥 حذف calc و --scale-factor */
+            border-radius: 18px;
+            /* 💥 حذف calc و --scale-factor */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .card-header {
             background: rgba(255, 255, 255, 0.1);
-            border-bottom: 1px solid var(--glass-border); /* 💥 استخدام لون من theme */
-            border-radius: 18px 18px 0 0 !important; /* 💥 حذف calc و --scale-factor */
+            border-bottom: 1px solid var(--glass-border);
+            /* 💥 استخدام لون من theme */
+            border-radius: 18px 18px 0 0 !important;
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .btn-primary {
-            background: var(--neon-blue); /* 💥 استخدام لون من theme */
+            background: var(--neon-blue);
+            /* 💥 استخدام لون من theme */
             border: none;
-            border-radius: 12px; /* 💥 حذف calc و --scale-factor */
+            border-radius: 12px;
+            /* 💥 حذف calc و --scale-factor */
             font-weight: 600;
             transition: all 0.3s ease;
         }
@@ -298,26 +375,31 @@
         .btn-primary:hover {
             background: #2980b9;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4); /* 💥 حذف calc و --scale-factor */
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .btn-outline-primary {
             color: white;
             border-color: rgba(255, 255, 255, 0.5);
-            border-radius: 12px; /* 💥 حذف calc و --scale-factor */
+            border-radius: 12px;
+            /* 💥 حذف calc و --scale-factor */
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .btn-outline-primary:hover {
             background: white;
-            color: var(--neon-blue); /* 💥 استخدام لون من theme */
+            color: var(--neon-blue);
+            /* 💥 استخدام لون من theme */
         }
 
         .btn-danger {
-            background: var(--danger); /* 💥 استخدام متغير عام */
+            background: var(--danger);
+            /* 💥 استخدام متغير عام */
             border: none;
-            border-radius: 12px; /* 💥 حذف calc و --scale-factor */
+            border-radius: 12px;
+            /* 💥 حذف calc و --scale-factor */
             font-weight: 600;
             transition: all 0.3s ease;
         }
@@ -329,9 +411,12 @@
 
         .form-control,
         .form-select {
-            border-radius: 12px; /* 💥 حذف calc و --scale-factor */
-            padding: 12px; /* 💥 حذف calc و --scale-factor */
-            border: 2px solid rgba(255, 255, 255, 0.3); /* 💥 حذف calc و --scale-factor */
+            border-radius: 12px;
+            /* 💥 حذف calc و --scale-factor */
+            padding: 12px;
+            /* 💥 حذف calc و --scale-factor */
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            /* 💥 حذف calc و --scale-factor */
             background: rgba(255, 255, 255, 0.1);
             color: white;
         }
@@ -342,8 +427,10 @@
 
         .form-control:focus,
         .form-select:focus {
-            border-color: var(--neon-blue); /* 💥 استخدام لون من theme */
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25); /* 💥 حذف calc و --scale-factor */
+            border-color: var(--neon-blue);
+            /* 💥 استخدام لون من theme */
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            /* 💥 حذف calc و --scale-factor */
             background: rgba(255, 255, 255, 0.15);
             color: white;
         }
@@ -359,31 +446,45 @@
 
         .table th,
         .table td {
-            border-top: 1px solid rgba(255, 255, 255, 0.2); /* 💥 حذف calc و --scale-factor */
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            /* 💥 حذف calc و --scale-factor */
         }
 
         .table thead th {
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3); /* 💥 حذف calc و --scale-factor */
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            /* 💥 حذف calc و --scale-factor */
         }
 
         /* ================== MOBILE HIDE (Added) ================== */
-        @media (max-width: 768px) { /* 💥 أو أي حجم تراه مناسب */
+        @media (max-width: 768px) {
+
+            /* 💥 أو أي حجم تراه مناسب */
             .top-bar-container {
-                display: none; /* 💥 إخفاء الشريط العلوي */
+                display: none;
+                /* 💥 إخفاء الشريط العلوي */
             }
+
             #menuToggleBtn {
-                display: none; /* 💥 إخفاء زر فتح القائمة */
+                display: none;
+                /* 💥 إخفاء زر فتح القائمة */
             }
+
             .content-wrapper {
-                margin-top: 5px; /* 💥 تقليل مساحة الأعلى */
-                padding-top: 5px; /* 💥 تقليل مساحة الأعلى */
+                margin-top: 5px;
+                /* 💥 تقليل مساحة الأعلى */
+                padding-top: 5px;
+                /* 💥 تقليل مساحة الأعلى */
             }
+
             /* 💥 إظهار Bottom Nav على الموبايل فقط */
             .bottom-nav {
-                display: block !important; /* 💥 تم التغيير من flex إلى block */
+                display: block !important;
+                /* 💥 تم التغيير من flex إلى block */
             }
+
             .sidebar {
-                padding-bottom: 92px; /* 💥 إضافة مساحة للـ Sidebar لتفادي تغطية الـ Bottom Nav */
+                padding-bottom: 92px;
+                /* 💥 إضافة مساحة للـ Sidebar لتفادي تغطية الـ Bottom Nav */
             }
         }
 
@@ -393,24 +494,33 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 92px; /* 💥 نفس الارتفاع المستخدم في padding */
+            height: 92px;
+            /* 💥 نفس الارتفاع المستخدم في padding */
             background: var(--bottom-bg);
             backdrop-filter: blur(14px);
             border-top: 1px solid rgba(255, 255, 255, 0.15);
-            display: none; /* 💥 مخفي افتراضيًا */
+            display: none;
+            /* 💥 مخفي افتراضيًا */
             /* 💥 تم حذف justify-content */
-            z-index: 2000; /* 💥 أعلى من الـ sidebar */
-            padding: 0 10px; /* 💥 مسافة داخلية */
+            z-index: 2000;
+            /* 💥 أعلى من الـ sidebar */
+            padding: 0 10px;
+            /* 💥 مسافة داخلية */
             /* 💥 إضافة خصائص جديدة لتمكين التمرير الأفقي */
-            overflow-x: auto; /* 💥 تمكين التمرير الأفقي */
-            -ms-overflow-style: auto;  /* IE and Edge */
-            scrollbar-width: auto;  /* Firefox */
+            overflow-x: auto;
+            /* 💥 تمكين التمرير الأفقي */
+            -ms-overflow-style: auto;
+            /* IE and Edge */
+            scrollbar-width: auto;
+            /* Firefox */
             /* 💥 إزالة التفاف العناصر */
-            white-space: nowrap; /* 💥 جعل العناصر في خط واحد */
+            white-space: nowrap;
+            /* 💥 جعل العناصر في خط واحد */
         }
 
         .bottom-nav-item {
-            display: inline-flex; /* 💥 تغيير إلى inline-flex */
+            display: inline-flex;
+            /* 💥 تغيير إلى inline-flex */
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -419,31 +529,41 @@
             padding: 8px 12px;
             border-radius: 10px;
             transition: all 0.2s ease;
-            gap: 4px; /* 💥 فراغ بين الأيقونة والنص */
-            flex: 0 0 auto; /* 💥 لا يمتد أو ين co */
-            min-width: fit-content; /* 💥 الحد الأدنى من العرض */
-            margin: 0 5px; /* 💥 مسافة بين العناصر */
+            gap: 4px;
+            /* 💥 فراغ بين الأيقونة والنص */
+            flex: 0 0 auto;
+            /* 💥 لا يمتد أو ين co */
+            min-width: fit-content;
+            /* 💥 الحد الأدنى من العرض */
+            margin: 0 5px;
+            /* 💥 مسافة بين العناصر */
         }
 
         .bottom-nav-item:hover,
         .bottom-nav-item.active {
-            background: rgba(52, 152, 219, 0.2); /* 💥 لون الخلفية عند التحوم أو النشاط */
-            color: white; /* 💥 لون النص عند التحوم أو النشاط */
+            background: rgba(52, 152, 219, 0.2);
+            /* 💥 لون الخلفية عند التحوم أو النشاط */
+            color: white;
+            /* 💥 لون النص عند التحوم أو النشاط */
         }
 
         .bottom-nav-item i {
-            font-size: 1.4rem; /* 💥 حجم الأيقونة */
+            font-size: 1.4rem;
+            /* 💥 حجم الأيقونة */
         }
 
         .bottom-nav-item span {
-            font-size: 0.75rem; /* 💥 حجم النص */
+            font-size: 0.75rem;
+            /* 💥 حجم النص */
         }
 
         /* ================== 响应式设计：移动设备 (Max 768px) ================== */
         @media (max-width: 768px) {
             .sidebar {
-                transform: translateX(-100%); /* 💥 حذف calc و --scale-factor */
-                width: 260px; /* 💥 حذف calc و --scale-factor */
+                transform: translateX(-100%);
+                /* 💥 حذف calc و --scale-factor */
+                width: 260px;
+                /* 💥 حذف calc و --scale-factor */
             }
 
             .sidebar.show {
@@ -496,12 +616,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('admin.attendance.qr') ? 'active' : '' }}"
-        href="{{ route('admin.attendance.qr') }}">
-        <i class="bi bi-qr-code"></i>
-        <span>رمز حضور الموظفين</span>
-    </a>
-</li>
+                    <a class="nav-link {{ request()->routeIs('admin.attendance.qr') ? 'active' : '' }}"
+                        href="{{ route('admin.attendance.qr') }}">
+                        <i class="bi bi-qr-code"></i>
+                        <span>رمز حضور الموظفين</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('work-schedule-settings.edit') ? 'active' : '' }}"
                         href="{{ route('work-schedule-settings.edit') }}">
@@ -593,48 +713,58 @@
 
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-        <a href="{{ route('admin.dashboard') }}" class="bottom-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+        <a href="{{ route('admin.dashboard') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="bi bi-speedometer2"></i>
             <span>الرئيسية</span>
         </a>
-        <a href="{{ route('admin.attendance.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.attendance.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}">
             <i class="bi bi-calendar-check"></i>
             <span>الحضور</span>
         </a>
-        <a href="{{ route('admin.laptops.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.laptops.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.laptops.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.laptops.*') ? 'active' : '' }}">
             <i class="bi bi-laptop"></i>
             <span>الأجهزة</span>
         </a>
-        <a href="{{ route('admin.orders.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.orders.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
             <i class="bi bi-cart-check"></i>
             <span>الطلبات</span>
         </a>
-        <a href="{{ route('admin.users.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.users.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
             <i class="bi bi-people"></i>
             <span>المستخدمين</span>
         </a>
         <!-- 💥 مثال على عنصر إضافي -->
-        <a href="{{ route('admin.roles.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.roles.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
             <i class="bi bi-person-badge"></i>
             <span>الأدوار</span>
         </a>
         <!-- 💥 مثال على عنصر إضافي -->
-        <a href="{{ route('admin.tasks.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.tasks.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.tasks.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.tasks.*') ? 'active' : '' }}">
             <i class="bi bi-list-check"></i>
             <span>المهام</span>
         </a>
         <!-- 💥 مثال على عنصر إضافي -->
-        <a href="{{ route('admin.permissions.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.permissions.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}">
             <i class="bi bi-shield-lock"></i>
             <span>الصلاحيات</span>
         </a>
         <!-- 💥 مثال على عنصر إضافي -->
-        <a href="{{ route('admin.priorities.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.priorities.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.priorities.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.priorities.*') ? 'active' : '' }}">
             <i class="bi bi-exclamation-triangle"></i>
             <span>الأولويات</span>
         </a>
         <!-- 💥 مثال على عنصر إضافي -->
-        <a href="{{ route('admin.task_statuses.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.task_statuses.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.task_statuses.index') }}"
+            class="bottom-nav-item {{ request()->routeIs('admin.task_statuses.*') ? 'active' : '' }}">
             <i class="bi bi-clipboard-check"></i>
             <span>الحالات</span>
         </a>
