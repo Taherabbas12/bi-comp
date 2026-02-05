@@ -233,15 +233,15 @@ class AttendanceAdminController extends Controller
 
         $validated = $request->validate([
             'work_date' => 'required|date',
-            'check_in_at' => 'nullable|date_format:Y-m-d H:i',
-            'check_out_at' => 'nullable|date_format:Y-m-d H:i',
+            'check_in_at' => 'nullable|date_format:Y-m-d\TH:i',
+            'check_out_at' => 'nullable|date_format:Y-m-d\TH:i',
         ]);
 
         // تحديث التاريخ والأوقات
         $attendance->update([
             'work_date' => $validated['work_date'],
-            'check_in_at' => $validated['check_in_at'] ? Carbon::createFromFormat('Y-m-d H:i', $validated['check_in_at']) : null,
-            'check_out_at' => $validated['check_out_at'] ? Carbon::createFromFormat('Y-m-d H:i', $validated['check_out_at']) : null,
+            'check_in_at' => $validated['check_in_at'] ? Carbon::createFromFormat('Y-m-d\TH:i', $validated['check_in_at']) : null,
+            'check_out_at' => $validated['check_out_at'] ? Carbon::createFromFormat('Y-m-d\TH:i', $validated['check_out_at']) : null,
         ]);
 
         return back()->with('success', 'تم تحديث سجل الحضور بنجاح');
