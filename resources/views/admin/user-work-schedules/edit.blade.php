@@ -35,7 +35,7 @@
                 <!-- Validation Errors -->
                 @if ($errors->any())
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-triangle"></i> 
+                        <i class="bi bi-exclamation-triangle"></i>
                         <strong>حدثت أخطاء في التحقق من البيانات:</strong>
                         <ul class="mb-0 mt-2">
                             @foreach ($errors->all() as $error)

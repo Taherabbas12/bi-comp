@@ -13,7 +13,7 @@ class AttendanceAdminController extends Controller
     // الصفحة الرئيسية لإدارة الحضور
     public function index(Request $request)
     {
-        $month  = $request->get('month', now()->format('Y-m'));
+        $month = $request->get('month', now()->format('Y-m'));
         $userId = $request->get('user_id'); // 👈 الموظف المختار
 
         // 🟢 بداية الفترة: 6
@@ -87,7 +87,8 @@ class AttendanceAdminController extends Controller
                 $weekStart = $currentDate->copy()->startOfWeek();
                 $weekEnd = $currentDate->copy()->endOfWeek();
 
-                if ($weekStart > $end) break;
+                if ($weekStart > $end)
+                    break;
                 if ($weekEnd < $start) {
                     $currentDate->addWeek();
                     $weekNumber++;
@@ -135,7 +136,7 @@ class AttendanceAdminController extends Controller
     }
     public function day(string $date, Request $request)
     {
-        $day    = Carbon::parse($date);
+        $day = Carbon::parse($date);
         $userId = $request->get('user_id');
 
         $query = Attendance::with('user')
@@ -153,7 +154,7 @@ class AttendanceAdminController extends Controller
     public function userMonthly(Request $request)
     {
         $userId = $request->get('user_id');
-        abort_if(! $userId, 404);
+        abort_if(!$userId, 404);
 
         $month = $request->get('month', now()->format('Y-m'));
 
@@ -174,7 +175,7 @@ class AttendanceAdminController extends Controller
             ->orderBy('work_date')
             ->get();
 
-        $totalMinutes = $records->sum(fn ($r) => $r->session_minutes);
+        $totalMinutes = $records->sum(fn($r) => $r->session_minutes);
 
         return view('admin.attendance.user-monthly', compact(
             'user',
@@ -259,7 +260,7 @@ class AttendanceAdminController extends Controller
             $dayOfWeekDb = $dayOfWeek === 0 ? 7 : $dayOfWeek;
 
             // البحث عن جدول العمل للموظف في هذا اليوم
-            $schedule = \App\Models\WorkSchedule::where('user_id', $userId)
+            $schedule = \App\Models\UserWorkSchedule::where('user_id', $userId)
                 ->where('day_of_week', $dayOfWeekDb)
                 ->first();
 
