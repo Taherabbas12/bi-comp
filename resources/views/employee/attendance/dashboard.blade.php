@@ -422,18 +422,40 @@
         font-size: 1rem;
     }
 
-    /* فيديو النجاح */
+    /* فيديو النجاح — إجباري فوق كل الواجهات */
+    #successVideoModal {
+        z-index: 2147483647;
+        background: #000;
+        padding: 0;
+        pointer-events: auto;
+    }
+    #successVideoModal.success-video-modal.active {
+        display: flex !important;
+    }
+    body.success-video-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
     .success-video-modal .modal-content {
-        max-width: 95vw;
-        max-height: 90vh;
+        max-width: 100vw;
+        max-height: 100vh;
+        width: 100vw;
+        height: 100vh;
         display: flex;
         flex-direction: column;
+        border-radius: 0;
+        border: none;
+        padding: 16px;
+        box-sizing: border-box;
     }
     .success-video-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 8px;
+        flex-shrink: 0;
     }
     .success-video-close {
         background: none;
@@ -448,18 +470,23 @@
         color: var(--green);
         margin: 0 0 12px 0;
         font-size: 0.95rem;
+        flex-shrink: 0;
     }
     .success-video-wrapper {
         flex: 1;
-        min-height: 200px;
+        min-height: 0;
         border-radius: 12px;
         overflow: hidden;
         background: #000;
         margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .success-video {
         width: 100%;
         height: 100%;
+        object-fit: contain;
         display: block;
     }
 
@@ -831,6 +858,7 @@
             document.getElementById('successVideoMessage').textContent = message || 'تم تسجيل الحضور بنجاح';
             const modal = document.getElementById('successVideoModal');
             const video = document.getElementById('successVideo');
+            document.body.classList.add('success-video-open');
             modal.classList.add('active');
             video.currentTime = 0;
             video.muted = true;
@@ -844,6 +872,7 @@
             video.pause();
             video.onended = null;
             modal.classList.remove('active');
+            document.body.classList.remove('success-video-open');
             location.reload();
         }
 
