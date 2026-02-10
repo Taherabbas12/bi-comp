@@ -422,6 +422,47 @@
         font-size: 1rem;
     }
 
+    /* فيديو النجاح */
+    .success-video-modal .modal-content {
+        max-width: 95vw;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+    .success-video-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .success-video-close {
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 2rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0 8px;
+    }
+    .success-video-message {
+        color: var(--green);
+        margin: 0 0 12px 0;
+        font-size: 0.95rem;
+    }
+    .success-video-wrapper {
+        flex: 1;
+        min-height: 200px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #000;
+        margin-bottom: 12px;
+    }
+    .success-video {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
     /* =============================
        ⬆️ TOP ACTION BUTTONS
     ============================= */
@@ -682,6 +723,24 @@
         </div>
     </div>
 
+    <!-- فيديو النجاح عند تسجيل الحضور -->
+    <div id="successVideoModal" class="modal success-video-modal">
+        <div class="modal-content success-video-content">
+            <div class="success-video-header">
+                <h3 class="modal-title">✅ تم تسجيل الحضور بنجاح</h3>
+                <button type="button" class="success-video-close" onclick="closeSuccessVideo()" aria-label="إغلاق">×</button>
+            </div>
+            <p id="successVideoMessage" class="success-video-message"></p>
+            <div class="success-video-wrapper">
+                <video id="successVideo" class="success-video" playsinline autoplay muted>
+                    <source src="{{ asset('WhatsApp Video 2026-02-10 at 14.21.34.mp4') }}" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+            </div>
+            <button type="button" class="close-btn" onclick="closeSuccessVideo()">إغلاق ومتابعة</button>
+        </div>
+    </div>
+
 @endsection
 
 @section('scripts')
@@ -767,6 +826,27 @@
             }
         }
 
+        function showSuccessVideo(message) {
+            document.getElementById('qrModal').classList.remove('active');
+            document.getElementById('successVideoMessage').textContent = message || 'تم تسجيل الحضور بنجاح';
+            const modal = document.getElementById('successVideoModal');
+            const video = document.getElementById('successVideo');
+            modal.classList.add('active');
+            video.currentTime = 0;
+            video.muted = true;
+            video.play().catch(() => {});
+            video.onended = () => { closeSuccessVideo(); };
+        }
+
+        function closeSuccessVideo() {
+            const modal = document.getElementById('successVideoModal');
+            const video = document.getElementById('successVideo');
+            video.pause();
+            video.onended = null;
+            modal.classList.remove('active');
+            location.reload();
+        }
+
         function send(qr) {
             navigator.geolocation.getCurrentPosition(
                 pos => {
@@ -785,9 +865,13 @@
                             })
                         .then(r => r.json())
                         .then(data => {
-                            alert(data.message);
-                            if (data.status) location.reload();
-                            else locked = false;
+                            if (data.status && mode === 'checkin') {
+                                showSuccessVideo(data.message);
+                            } else {
+                                alert(data.message);
+                                if (data.status) location.reload();
+                                else locked = false;
+                            }
                         })
                         .catch(() => {
                             alert('حدث خطأ أثناء الاتصال.');
