@@ -422,12 +422,14 @@
         font-size: 1rem;
     }
 
-    /* فيديو النجاح — إجباري فوق كل الواجهات */
+    /* فيديو النجاح — الفيديو فقط فوق كل الواجهات */
     #successVideoModal {
         z-index: 2147483647;
         background: #000;
         padding: 0;
-        pointer-events: auto;
+        margin: 0;
+        align-items: center;
+        justify-content: center;
     }
     #successVideoModal.success-video-modal.active {
         display: flex !important;
@@ -438,52 +440,7 @@
         width: 100%;
         height: 100%;
     }
-    .success-video-modal .modal-content {
-        max-width: 100vw;
-        max-height: 100vh;
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        border-radius: 0;
-        border: none;
-        padding: 16px;
-        box-sizing: border-box;
-    }
-    .success-video-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-        flex-shrink: 0;
-    }
-    .success-video-close {
-        background: none;
-        border: none;
-        color: var(--text);
-        font-size: 2rem;
-        line-height: 1;
-        cursor: pointer;
-        padding: 0 8px;
-    }
-    .success-video-message {
-        color: var(--green);
-        margin: 0 0 12px 0;
-        font-size: 0.95rem;
-        flex-shrink: 0;
-    }
-    .success-video-wrapper {
-        flex: 1;
-        min-height: 0;
-        border-radius: 12px;
-        overflow: hidden;
-        background: #000;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .success-video {
+    .success-video-full {
         width: 100%;
         height: 100%;
         object-fit: contain;
@@ -750,22 +707,11 @@
         </div>
     </div>
 
-    <!-- فيديو النجاح عند تسجيل الحضور -->
-    <div id="successVideoModal" class="modal success-video-modal">
-        <div class="modal-content success-video-content">
-            <div class="success-video-header">
-                <h3 class="modal-title">✅ تم تسجيل الحضور بنجاح</h3>
-                <button type="button" class="success-video-close" onclick="closeSuccessVideo()" aria-label="إغلاق">×</button>
-            </div>
-            <p id="successVideoMessage" class="success-video-message"></p>
-            <div class="success-video-wrapper">
-                <video id="successVideo" class="success-video" playsinline autoplay muted>
-                    <source src="{{ asset('WhatsApp Video 2026-02-10 at 14.21.34.mp4') }}" type="video/mp4">
-                    متصفحك لا يدعم تشغيل الفيديو.
-                </video>
-            </div>
-            <button type="button" class="close-btn" onclick="closeSuccessVideo()">إغلاق ومتابعة</button>
-        </div>
+    <!-- فيديو النجاح — الفيديو فقط بدون تفاصيل -->
+    <div id="successVideoModal" class="modal success-video-modal" onclick="closeSuccessVideo()">
+        <video id="successVideo" class="success-video-full" playsinline autoplay muted onclick="event.stopPropagation();">
+            <source src="{{ asset('WhatsApp Video 2026-02-10 at 14.21.34.mp4') }}" type="video/mp4">
+        </video>
     </div>
 
 @endsection
@@ -853,9 +799,8 @@
             }
         }
 
-        function showSuccessVideo(message) {
+        function showSuccessVideo() {
             document.getElementById('qrModal').classList.remove('active');
-            document.getElementById('successVideoMessage').textContent = message || 'تم تسجيل الحضور بنجاح';
             const modal = document.getElementById('successVideoModal');
             const video = document.getElementById('successVideo');
             document.body.classList.add('success-video-open');
@@ -895,7 +840,7 @@
                         .then(r => r.json())
                         .then(data => {
                             if (data.status && mode === 'checkin') {
-                                showSuccessVideo(data.message);
+                                showSuccessVideo();
                             } else {
                                 alert(data.message);
                                 if (data.status) location.reload();
