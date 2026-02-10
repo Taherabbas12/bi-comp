@@ -709,9 +709,7 @@
 
     <!-- فيديو النجاح — الفيديو فقط بدون تفاصيل -->
     <div id="successVideoModal" class="modal success-video-modal" onclick="closeSuccessVideo()">
-        <video id="successVideo" class="success-video-full" playsinline autoplay muted onclick="event.stopPropagation();">
-            <source src="{{ asset('WhatsApp Video 2026-02-10 at 14.21.34.mp4') }}" type="video/mp4">
-        </video>
+        <video id="successVideo" class="success-video-full" playsinline muted preload="auto" onclick="event.stopPropagation();"></video>
     </div>
 
 @endsection
@@ -803,12 +801,26 @@
             document.getElementById('qrModal').classList.remove('active');
             const modal = document.getElementById('successVideoModal');
             const video = document.getElementById('successVideo');
+            const videoUrl = "{{ asset('attendance-success.mp4') }}";
             document.body.classList.add('success-video-open');
             modal.classList.add('active');
+            video.onended = () => { closeSuccessVideo(); };
+            video.onerror = () => { closeSuccessVideo(); };
+            if (video.src !== videoUrl) {
+                video.src = videoUrl;
+                video.load();
+            }
             video.currentTime = 0;
             video.muted = true;
-            video.play().catch(() => {});
-            video.onended = () => { closeSuccessVideo(); };
+            function doPlay() {
+                video.play().catch(function() { setTimeout(closeSuccessVideo, 500); });
+            }
+            if (video.readyState >= 2) {
+                doPlay();
+            } else {
+                video.addEventListener('canplay', doPlay, { once: true });
+                video.addEventListener('error', function() { setTimeout(closeSuccessVideo, 500); }, { once: true });
+            }
         }
 
         function closeSuccessVideo() {
