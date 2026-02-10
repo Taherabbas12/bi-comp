@@ -119,6 +119,14 @@ Route::get('/attendance/calendar-data',
 
     Route::post('/attendance/handle-forgotten', [AttendanceController::class, 'handleForgottenSession'])->name('attendance.handle_forgotten');
 
+    Route::get('/attendance-success-video', function () {
+        $path = public_path('attendance-success.mp4');
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path, ['Content-Type' => 'video/mp4']);
+    })->name('attendance.success.video');
+
         // صفحة عرض QR
         Route::get('/attendance/qr', [AttendanceQrController::class, 'show'])
             ->name('admin.attendance.qr');

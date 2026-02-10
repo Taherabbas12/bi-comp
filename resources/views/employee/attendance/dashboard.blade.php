@@ -801,26 +801,21 @@
             document.getElementById('qrModal').classList.remove('active');
             const modal = document.getElementById('successVideoModal');
             const video = document.getElementById('successVideo');
-            const videoUrl = "{{ asset('attendance-success.mp4') }}";
+            const videoUrl = "{{ url(route('attendance.success.video')) }}";
             document.body.classList.add('success-video-open');
             modal.classList.add('active');
-            video.onended = () => { closeSuccessVideo(); };
-            video.onerror = () => { closeSuccessVideo(); };
-            if (video.src !== videoUrl) {
-                video.src = videoUrl;
-                video.load();
-            }
+            video.onended = function() { closeSuccessVideo(); };
+            video.onerror = function() { /* لا نغلق تلقائياً — المستخدم يضغط للإغلاق */ };
+            video.src = videoUrl;
+            video.load();
             video.currentTime = 0;
             video.muted = true;
             function doPlay() {
-                video.play().catch(function() { setTimeout(closeSuccessVideo, 500); });
+                video.play().catch(function() {});
             }
-            if (video.readyState >= 2) {
-                doPlay();
-            } else {
-                video.addEventListener('canplay', doPlay, { once: true });
-                video.addEventListener('error', function() { setTimeout(closeSuccessVideo, 500); }, { once: true });
-            }
+            video.addEventListener('loadeddata', doPlay, { once: true });
+            video.addEventListener('canplay', doPlay, { once: true });
+            setTimeout(doPlay, 100);
         }
 
         function closeSuccessVideo() {
