@@ -440,11 +440,38 @@
         width: 100%;
         height: 100%;
     }
+    .success-video-wrap {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .success-video-full {
         width: 100%;
         height: 100%;
         object-fit: contain;
         display: block;
+    }
+    .unmute-video-btn {
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(34, 197, 94, 0.9);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .unmute-video-btn:hover {
+        background: rgba(34, 197, 94, 1);
     }
 
     /* =============================
@@ -709,7 +736,10 @@
 
     <!-- فيديو النجاح — الفيديو فقط بدون تفاصيل -->
     <div id="successVideoModal" class="modal success-video-modal" onclick="closeSuccessVideo()">
-        <video id="successVideo" class="success-video-full" playsinline muted preload="auto" onclick="event.stopPropagation();"></video>
+        <div class="success-video-wrap" onclick="event.stopPropagation();">
+            <video id="successVideo" class="success-video-full" playsinline preload="auto" onclick="unmuteVideo();"></video>
+            <button type="button" id="unmuteVideoBtn" class="unmute-video-btn" onclick="event.stopPropagation(); unmuteVideo();" style="display: none;">🔊 تشغيل الصوت</button>
+        </div>
     </div>
 
 @endsection
@@ -809,13 +839,30 @@
             video.src = videoUrl;
             video.load();
             video.currentTime = 0;
-            video.muted = true;
+            video.muted = false;
+            document.getElementById('unmuteVideoBtn').style.display = 'none';
             function doPlay() {
-                video.play().catch(function() {});
+                video.play().then(function() {
+                    if (video.muted) document.getElementById('unmuteVideoBtn').style.display = 'block';
+                }).catch(function() {
+                    video.muted = true;
+                    video.play().catch(function() {});
+                    document.getElementById('unmuteVideoBtn').style.display = 'block';
+                });
             }
             video.addEventListener('loadeddata', doPlay, { once: true });
             video.addEventListener('canplay', doPlay, { once: true });
             setTimeout(doPlay, 100);
+        }
+
+        function unmuteVideo() {
+            const video = document.getElementById('successVideo');
+            const btn = document.getElementById('unmuteVideoBtn');
+            if (video.muted) {
+                video.muted = false;
+                video.play().catch(function() {});
+                btn.style.display = 'none';
+            }
         }
 
         function closeSuccessVideo() {
@@ -823,6 +870,7 @@
             const video = document.getElementById('successVideo');
             video.pause();
             video.onended = null;
+            document.getElementById('unmuteVideoBtn').style.display = 'none';
             modal.classList.remove('active');
             document.body.classList.remove('success-video-open');
             location.reload();
